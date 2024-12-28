@@ -9,7 +9,7 @@ import {
   FaPlus,
   FaUser,
   FaEnvelope,
-  FaRegCalendarAlt 
+  FaRegCalendarAlt,
 } from "react-icons/fa";
 
 const UserNavbar = () => {
@@ -23,7 +23,7 @@ const UserNavbar = () => {
       {/* Desktop Sidebar */}
       <div className="hidden md:flex flex-col w-64 text-slate-800 h-full">
         <div className="flex items-center justify-center h-20 border-b">
-          <h1 className="text-2xl font-bold">User Dashboard</h1>
+          <h1 className="text-2xl font-bold">Host Dashboard</h1>
         </div>
         <nav className="flex-1 p-4 space-y-4">
           <NavLink

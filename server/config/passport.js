@@ -1,5 +1,5 @@
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const Host = require('../models/profile'); 
+const Host = require('../model/profile'); 
 
 module.exports = (passport) => {
   passport.use(new GoogleStrategy({

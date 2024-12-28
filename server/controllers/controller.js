@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-const Host = require('../models/profile')
-const Otp = require('../models/otp');
+const Host = require('../model/profile')
+const Otp = require('../model/otp');
 const bcrypt = require('bcrypt');
 const { transporter } = require('../config/nodemailer');
 require('dotenv').config();
