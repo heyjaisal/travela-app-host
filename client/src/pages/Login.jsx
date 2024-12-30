@@ -63,6 +63,10 @@ const Login = () => {
         console.error('Login error:', err); 
       }
     };
+    const handleGoogleSignup = () => {
+      window.location.href = 'http://localhost:5000/auth/google';
+    };
+  
   
   return (
     <div className="flex h-screen w-screen">
@@ -124,13 +128,15 @@ const Login = () => {
               </button>
             </div>
           </div>
-
+          
    
           <div className="flex justify-end mb-4">
             <a href="#" className="text-sm text-indigo-500 hover:underline">
               Reset password
             </a>
           </div>
+          {error && <p className="text-red-500 text-sm text-center mb-3">{error}</p>}
+
 
 
           <button
@@ -148,15 +154,18 @@ const Login = () => {
           </div>
 
    
-          <button className="w-full flex items-center justify-center border border-gray-300 py-2 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+          <button
+            onClick={handleGoogleSignup}
+            type="button"
+            className="w-full flex items-center justify-center border border-gray-300 py-2 rounded-lg hover:bg-gray-100"
+          >
             <img
               src="https://img.icons8.com/color/24/000000/google-logo.png"
-              alt="Google logo"
+              alt="Google Logo"
               className="mr-2"
             />
-            Continue with Google
+            Sign Up with Google
           </button>
-
 
           <p className="mt-6 text-xs text-gray-500 text-center">
             By continuing, you agree to the{" "}
