@@ -26,6 +26,9 @@ function Profile() {
   const [mapType, setMapType] = useState("satellite"); // State to control map type
   const [files, setFiles] = useState([]); // State for uploaded files
 
+  // To-Do List States
+  const [todos, setTodos] = useState([]); // State to store tasks
+
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -37,7 +40,7 @@ function Profile() {
 
   // Handle map click to pin location
   const MapClick = () => {
-    const map = useMapEvent("click", (e) => {
+    useMapEvent("click", (e) => {
       setLocation({ lat: e.latlng.lat, lng: e.latlng.lng });
       fetchAddress(e.latlng.lat, e.latlng.lng);
     });
@@ -82,20 +85,39 @@ function Profile() {
     onDrop,
     accept: "image/*",
   });
-  const [value, setValue] = useState(1); // Initial value
 
-  // Increment function
-  const increment = () => setValue((prevValue) => prevValue + 1);
-
-  // Decrement function
-  const decrement = () => setValue((prevValue) => (prevValue > 0 ? prevValue - 1 : 0));
-
-  // Handle manual input
-  const handleChange = (e) => {
-    const newValue = Math.max(0, parseInt(e.target.value) || 0); // Prevent negative values
-    setValue(newValue);
+  // Add To-Do Task
+  const addTodo = (task) => {
+    axios
+      .post("/api/todos", { task }) // Send a POST request to add a new task
+      .then((response) => {
+        setTodos([...todos, response.data]);
+      })
+      .catch((error) => console.error("Error adding task:", error));
   };
 
+  // Delete To-Do Task
+  const deleteTodo = (id) => {
+    axios
+      .delete(`/api/todos/${id}`) // Send a DELETE request to remove the task
+      .then(() => {
+        setTodos(todos.filter((todo) => todo.id !== id));
+      })
+      .catch((error) => console.error("Error deleting task:", error));
+  };
+
+  // Update To-Do Task
+  const updateTodo = (id, updatedTask) => {
+    axios
+      .put(`/api/todos/${id}`, { task: updatedTask }) // Send a PUT request to update the task
+      .then((response) => {
+        const updatedTodos = todos.map((todo) =>
+          todo.id === id ? response.data : todo
+        );
+        setTodos(updatedTodos);
+      })
+      .catch((error) => console.error("Error updating task:", error));
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -202,7 +224,7 @@ function Profile() {
               {/* Description Textarea */}
               <div className="mb-4">
                 <label
-                 htmlFor="description"
+                  htmlFor="description"
                   className="block text-sm font-semibold text-gray-700"
                 >
                   Description
@@ -217,157 +239,46 @@ function Profile() {
                   placeholder="Enter description"
                 />
               </div>
-        
-              <div className="border  rounded-lg p-2 flex items-center justify-between bg-white mb-3">
-  <label className="text-lg font-semibold text-gray-800 mr-4 pl-1">Rooms</label>
 
-  <div className="flex items-center space-x-2">
-    {/* Decrement Button */}
-    <button
-      onClick={decrement}
-      className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition duration-200"
-    >
-      <span className="text-2xl font-bold">-</span>
-    </button>
-
-    {/* Value Display */}
-    <input
-      type="number"
-      value={value}
-      onChange={handleChange}
-      className="w-16 text-center font-semibold text-xl px-3 py-1 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
-    />
-
-    {/* Increment Button */}
-    <button
-      onClick={increment}
-      className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition duration-200"
-    >
-      <span className="text-2xl font-bold">+</span>
-    </button>
-  </div>
-</div>
-<div className="border  rounded-lg p-2 flex items-center justify-between bg-white mb-3">
-  <label className="text-lg font-semibold text-gray-800 mr-4 pl-1">Kitchen</label>
-
-  <div className="flex items-center space-x-2">
-    {/* Decrement Button */}
-    <button
-      onClick={decrement}
-      className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition duration-200"
-    >
-      <span className="text-2xl font-bold">-</span>
-    </button>
-
-    {/* Value Display */}
-    <input
-      type="number"
-      value={value}
-      onChange={handleChange}
-      className="w-16 text-center font-semibold text-xl px-3 py-1 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
-    />
-
-    {/* Increment Button */}
-    <button
-      onClick={increment}
-      className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition duration-200"
-    >
-      <span className="text-2xl font-bold">+</span>
-    </button>
-  </div>
-</div>
-<div className="border  rounded-lg p-2 flex items-center justify-between bg-white mb-3">
-  <label className="text-lg font-semibold text-gray-800 mr-4 pl-1">Bathroom</label>
-
-  <div className="flex items-center space-x-2">
-    {/* Decrement Button */}
-    <button
-      onClick={decrement}
-      className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition duration-200"
-    >
-      <span className="text-2xl font-bold">-</span>
-    </button>
-
-    {/* Value Display */}
-    <input
-      type="number"
-      value={value}
-      onChange={handleChange}
-      className="w-16 text-center font-semibold text-xl px-3 py-1 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
-    />
-
-    {/* Increment Button */}
-    <button
-      onClick={increment}
-      className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition duration-200"
-    >
-      <span className="text-2xl font-bold">+</span>
-    </button>
-  </div>
-</div>
-<div className="border  rounded-lg p-2 flex items-center justify-between bg-white mb-3">
-  <label className="text-lg font-semibold text-gray-800 mr-4 pl-1">Max Guests</label>
-
-  <div className="flex items-center space-x-2">
-    {/* Decrement Button */}
-    <button
-      onClick={decrement}
-      className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition duration-200"
-    >
-      <span className="text-2xl font-bold">-</span>
-    </button>
-
-    {/* Value Display */}
-    <input
-      type="number"
-      value={value}
-      onChange={handleChange}
-      className="w-16 text-center font-semibold text-xl px-3 py-1 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
-    />
-
-    {/* Increment Button */}
-    <button
-      onClick={increment}
-      className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition duration-200"
-    >
-      <span className="text-2xl font-bold">+</span>
-    </button>
-  </div>
-</div>
-<div className="border  rounded-lg p-2 flex items-center justify-between bg-white">
-  <label className="text-lg font-semibold text-gray-800 mr-4 pl-1">Max Stay</label>
-
-  <div className="flex items-center space-x-2">
-    {/* Decrement Button */}
-    <button
-      onClick={decrement}
-      className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition duration-200"
-    >
-      <span className="text-2xl font-bold">-</span>
-    </button>
-
-    {/* Value Display */}
-    <input
-      type="number"
-      value={value}
-      onChange={handleChange}
-      className="w-16 text-center font-semibold text-xl px-3 py-1 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
-    />
-
-    {/* Increment Button */}
-    <button
-      onClick={increment}
-      className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition duration-200"
-    >
-      <span className="text-2xl font-bold">+</span>
-    </button>
-  </div>
-</div>
-
+              {/* To-Do List Section */}
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold mb-4 text-purple-600">To-Do List</h2>
+                <ul className="space-y-2">
+                  {todos.map((todo) => (
+                    <li key={todo.id} className="flex items-center justify-between bg-gray-100 p-3 rounded-lg shadow-sm">
+                      <span>{todo.task}</span>
+                      <div className="space-x-2">
+                        <button
+                          className="text-blue-500"
+                          onClick={() => updateTodo(todo.id, prompt("Edit task", todo.task))}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="text-red-500"
+                          onClick={() => deleteTodo(todo.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg"
+                  onClick={() => {
+                    const task = prompt("New task:");
+                    if (task) addTodo(task);
+                  }}
+                >
+                  Add Task
+                </button>
+              </div>
             </div>
 
             {/* Map Section */}
-            <div className="flex-1 p-4">
+            <div className="flex-1 p-3 pt-0">
+              {/* File Upload */}
               <div className="mb-4">
                 <h1 className="text-sm font-semibold mb-2">
                   Upload Room Photos
@@ -423,7 +334,7 @@ function Profile() {
               </div>
 
               {/* Map */}
-              <div className="mb-4">
+              <div className="relative z-10">
                 <MapContainer
                   center={location}
                   zoom={19}
@@ -433,16 +344,14 @@ function Profile() {
                   {/* Conditionally Render TileLayer based on mapType */}
                   {mapType === "satellite" && (
                     <>
-                      <div className="flex">
-                        <TileLayer
-                          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                          attribution='Tiles &copy; <a href="https://www.esri.com/">Esri</a>'
-                        />
-                        <TileLayer
-                          url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
-                          attribution='Labels &copy; <a href="https://www.esri.com/">Esri</a>'
-                        />
-                      </div>
+                      <TileLayer
+                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                        attribution='Tiles &copy; <a href="https://www.esri.com/">Esri</a>'
+                      />
+                      <TileLayer
+                        url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                        attribution='Labels &copy; <a href="https://www.esri.com/">Esri</a>'
+                      />
                     </>
                   )}
 
@@ -468,12 +377,12 @@ function Profile() {
             </div>
           </div>
         )}
+
         {activeTab === "event" && (
           <div className="flex flex-col lg:flex-row gap-8 mb-4">
             <div className="flex-1 p-4">
               <h1>Event Content 1</h1>
             </div>
-
             <div className="flex-1 p-4">
               <h1>Event Content 2</h1>
             </div>
