@@ -139,7 +139,7 @@ const UserNavbar = () => {
           ></div>
           <div className="fixed inset-y-0 left-0 bg-white w-64 z-50 shadow-lg flex flex-col">
             <div className="flex items-center justify-center h-20 border-b">
-              <h1 className="text-2xl font-bold">User Dashboard</h1>
+              <h1 className="text-2xl font-bold">Host Dashboard</h1>
             </div>
             <nav className="flex-1 p-4 space-y-4">
               <NavLink
@@ -182,7 +182,7 @@ const UserNavbar = () => {
                 Create
               </NavLink>
               <NavLink
-                to="/notification"
+                to="/notifications"
                 onClick={closeSidebar}
                 className={({ isActive }) =>
                   `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
