@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
 const Host = require('../model/profile')
+const Event = require("../model/events")
 const Otp = require('../model/otp');
 const bcrypt = require('bcrypt');
 const { transporter } = require('../config/nodemailer');
+const Property = require('../model/housing');
 require('dotenv').config();
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
@@ -99,4 +101,71 @@ exports.verifyOtp = async (req, res) => {
         console.error('error logging in', error);
         res.status(400).json({ error: 'error logging in' });
     }
+};
+
+exports.addProperty = async (req, res) => {
+  try {
+    const propertyData = req.body;
+    console.log(propertyData);
+    
+    
+    // Validate incoming data (optional, but recommended)
+    if (!propertyData.address) {
+      return res.status(400).json({ message: 'address feild is required' });
+    }
+    if (!propertyData.propertyType) {
+      return res.status(400).json({ message: 'propertyType feild is required' });
+    }
+    if (!propertyData.size) {
+      return res.status(400).json({ message: 'size feild is required' });
+    }
+    if (!propertyData.price) {
+      return res.status(400).json({ message: 'price feild is required' });
+    }
+    if (!propertyData.description) {
+      return res.status(400).json({ message: 'description feild is required' });
+    }
+    if (!propertyData.location) {
+      return res.status(400).json({ message: 'location feild is required' });
+    }
+
+    
+    // Create a new property document
+    const newProperty = new Property(propertyData);
+    await newProperty.save();
+    
+    res.status(201).json({ message: 'Property added successfully', property: newProperty });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to add property', error: error.message });
+  }
+};
+
+exports.eventproperty =  async (req, res) => {
+  try {
+    const { eventType, title, eventVenue, ticketPrice, maxGuests, description, location, address } = req.body;
+    console.log(req.body);
+    
+
+    if (!eventType || !title || !eventVenue || !ticketPrice || !maxGuests || !location || !address) {
+      return res.status(400).json({ error: "All fields are required." });
+    }
+
+    const newEvent = new Event({
+      eventType,
+      title,
+      eventVenue,
+      ticketPrice,
+      maxGuests,
+      description,
+      location,
+      address,
+    });
+
+    const savedEvent = await newEvent.save();
+    res.status(201).json(savedEvent);
+  } catch (error) {
+    console.error("Error creating event:", error);
+    res.status(500).json({ error: "Failed to create event." });
+  }
 };

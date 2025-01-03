@@ -102,20 +102,20 @@ const UserNavbar = () => {
       </div>
 
       {/* Mobile Navbar */}
-      <div className="fixed bottom-0 left-0 right-0 md:hidden bg-white shadow-lg border-t">
+      <div className="fixed bottom-0 left-0 right-0 md:hidden bg-white shadow-lg border-t z-50">
         <nav className="flex justify-around p-2 text-slate-800">
           <button onClick={toggleSidebar} className="flex flex-col items-center gap-1">
             {isSidebarOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
             <span className="text-xs">Menu</span>
           </button>
-          
+
           <NavLink
             to="/messages"
             className={({ isActive }) =>
               `flex flex-col items-center gap-1 ${isActive ? "text-blue-500" : ""}`
             }
           >
-            <FaEnvelope  size={20}/>
+            <FaEnvelope size={20} />
             <span className="text-xs">Messages</span>
           </NavLink>
           <NavLink
@@ -162,15 +162,16 @@ const UserNavbar = () => {
                 <FaUsers />
                 Hosted
               </NavLink>
-          <NavLink
-            to="/payments"
-            className={({ isActive }) =>
-              `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
-            }
-          >
-            <FaEnvelope />
-            Payments
-          </NavLink>
+              <NavLink
+                to="/payments"
+                onClick={closeSidebar}
+                className={({ isActive }) =>
+                  `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+                }
+              >
+                <FaEnvelope />
+                Payments
+              </NavLink>
               <NavLink
                 to="/create"
                 onClick={closeSidebar}
@@ -199,7 +200,7 @@ const UserNavbar = () => {
                 }
               >
                 <FaBell />
-               Messages
+                Messages
               </NavLink>
               <NavLink
                 to="/booking"
