@@ -17,21 +17,12 @@ const Housing = () => {
     bathrooms: 0,
     maxGuests: 0,
     maxStay: 0,
+    location: { lat: 51.505, lng: -0.09 },
+    address: "",
+    searchQuery: "",
+    mapType: "satellite",
   });
-  const [location, setLocation] = useState({ lat: 51.505, lng: -0.09 });
-  const [address, setAddress] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [mapType, setMapType] = useState("satellite");
 
-  const validateFields = () => {
-    let tempErrors = {};
-    if (!houseData.size) tempErrors.size = "Size is required";
-    if (!houseData.price) tempErrors.price = "Price is required";
-    if (!houseData.description) tempErrors.description = "Description is required";
-    if (!location.lat || !location.lng) tempErrors.location = "Location is required";
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).length === 0;
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -41,52 +32,38 @@ const Housing = () => {
   const handleSearch = async () => {
     try {
       const response = await axios.get(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${houseData.searchQuery}`
       );
       const result = response.data[0];
       if (result) {
         const { lat, lon, display_name } = result;
-        setLocation({ lat, lng: lon });
-        setAddress(display_name);
-        setErrors((prev) => ({ ...prev, location: undefined }));
+        setEventForm({
+          ...houseData,
+          location: { lat: parseFloat(lat), lng: parseFloat(lon) },
+          address: display_name,
+        });
       }
     } catch (error) {
       console.error("Error fetching location:", error);
     }
   };
 
-  const fetchAddress = async (lat, lng) => {
-    try {
-      const response = await axios.get(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-      );
-      const { display_name } = response.data;
-      setAddress(display_name);
-    } catch (error) {
-      console.error("Error fetching address:", error);
-    }
-  };
-
+  const fetchAddress = async (lat,lng)=>{
+    try{
+      const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+      const {display_name}= response.data;
+      sethouseData(
+        (prev)=>({...prev,address :display_name}))
+    }catch
+    (
+      error
+    ){console.error("Error fetching address:", error)}
+  }
+  
   const handleMapClick = async (event) => {
     const { lat, lng } = event.latlng;
-    setLocation({ lat, lng });
+    sethouseData((prev) => ({ ...prev, location: { lat, lng } }));
     fetchAddress(lat, lng);
-    setErrors((prev) => ({ ...prev, location: undefined }));
-  };
-
-  const housingSubmit = async (e) => {
-    e.preventDefault();
-    if (validateFields()) {
-      try {
-        const submissionData = { ...houseData, location, address };
-        const response = await axios.post("http://localhost:5000/api/properties", submissionData);
-        console.log("Success:", response.data);
-        toast.success("Property details submitted successfully!"); // Success toast
-      } catch (error) {
-        console.error("Error:", error);
-        toast.error("Failed to submit property details."); // Error toast
-      }
-    }
   };
 
   const increment = (field) => {
@@ -94,15 +71,63 @@ const Housing = () => {
   };
 
   const decrement = (field) => {
-    sethouseData((prev) => ({ ...prev, [field]: Math.max(prev[field] - 1, 1) }));
+    sethouseData((prev) => ({
+      ...prev,
+      [field]: Math.max(prev[field] - 1, 1),
+    }));
+  };
+  const maptype = () => {
+    sethouseData((prev) => ({
+      ...prev,
+      mapType: prev.mapType === "satellite" ? "terrain" : "satellite",
+    }));
+  };
+
+  const validateFields = () => {
+    let tempErrors = {};
+    if (!houseData.size) tempErrors.size = "Size is required";
+    if (!houseData.price) tempErrors.price = "Price is required";
+    if (!houseData.description) tempErrors.description = "Description is required";
+    if (!houseData.location.lat || !houseData.location.lng) tempErrors.location = "Location is required";
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
+
+  const housingSubmit = async (e) => {
+    e.preventDefault();
+    if (validateFields()) {
+      try {
+        const response = await axios.post("http://localhost:5000/api/properties", houseData);
+        console.log("Success:", response.data);
+        toast.success("Property details submitted successfully!");
+        sethouseData({
+          propertyType: "apartment",
+    size: "",
+    price: "",
+    description: "",
+    bedrooms: 0,
+    kitchen: 0,
+    bathrooms: 0,
+    maxGuests: 0,
+    maxStay: 0,
+    location: { lat: 51.505, lng: -0.09 },
+    address: "",
+    searchQuery: "",
+    mapType: "satellite",
+
+        }) // Success toast
+      } catch (error) {
+        console.error("Error:", error);
+        toast.error("Failed to submit property details."); // Error toast
+      }
+    }
   };
 
   const MapClick = () => {
-    useMapEvent("click", (e) => {
-      setLocation({ lat: e.latlng.lat, lng: e.latlng.lng });
-      fetchAddress(e.latlng.lat, e.latlng.lng);
-    });
-  };
+      useMapEvent("click", handleMapClick);
+      return null;
+    };
+  
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -236,8 +261,8 @@ const Housing = () => {
         <div className="flex items-center mb-2">
           <input
             type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={houseData.searchQuery}
+            onChange={handleInputChange}
             placeholder="Search for a place"
             className="py-2 my-2 mr-3 px-3 rounded-lg text-center border border-gray-300 w-48"
           />
@@ -249,9 +274,7 @@ const Housing = () => {
           </button>
           <div>
             <button
-              onClick={() =>
-                setMapType((prevType) => (prevType === "satellite" ? "terrain" : "satellite"))
-              }
+              onClick={maptype}
               className="text-xl bg-white p-2 rounded-full shadow-md ml-3"
             >
               <FaMap />
@@ -262,41 +285,32 @@ const Housing = () => {
         {/* Map */}
         <div className="relative z-10">
           <MapContainer
-            center={location}
-            zoom={19}
-            scrollWheelZoom={true}
-            style={{ height: "400px", width: "100%" }}
-            onClick={handleMapClick}
-          >
-            {mapType === "satellite" && (
-              <>
-                <TileLayer
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                  attribution='Tiles &copy; <a href="https://www.esri.com/">Esri</a>'
-                />
-                <TileLayer
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
-                  attribution='Labels &copy; <a href="https://www.esri.com/">Esri</a>'
-                />
-              </>
-            )}
-            {mapType === "terrain" && (
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="&copy; OpenStreetMap contributors"
-              />
-            )}
-            <MapClick />
-            <Marker position={location}>
-              <Popup>{address}</Popup>
-            </Marker>
-          </MapContainer>
+                    center={houseData.location || { lat: 51.505, lng: -0.09 }} 
+                    style={{ height: "400px", width: "100%" }}
+                    onClick={handleMapClick}
+                  >
+                    {houseData.mapType === "satellite" ? (
+                      <TileLayer
+                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                        attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
+                      />
+                    ) : (
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution="&copy; OpenStreetMap contributors"
+                      />
+                    )}
+                    <MapClick />
+                    <Marker position={houseData.location || { lat: 51.505, lng: -0.09 }}>
+                      <Popup>{houseData.address || "Default Address"}</Popup>
+                    </Marker>
+                  </MapContainer>
         </div>
 
         <div className="mt-4">
-          <p>Location: {address}</p>
-          <p>Latitude: {location.lat}</p>
-          <p>Longitude: {location.lng}</p>
+          <p>Location: {houseData.address}</p>
+          <p>Latitude: {houseData.location.lat}</p>
+          <p>Longitude: {houseData.location.lng}</p>
         </div>
 
         {/* Cancel and Submit Buttons */}
@@ -306,14 +320,19 @@ const Housing = () => {
             onClick={() =>
               sethouseData({
                 propertyType: "apartment",
-                size: "",
-                price: "",
-                description: "",
-                bedrooms: 0,
-                kitchen: 0,
-                bathrooms: 0,
-                maxGuests: 0,
-                maxStay: 0,
+          size: "",
+          price: "",
+          description: "",
+          bedrooms: 0,
+          kitchen: 0,
+          bathrooms: 0,
+          maxGuests: 0,
+          maxStay: 0,
+          location: { lat: 51.505, lng: -0.09 },
+          address: "",
+          searchQuery: "",
+          mapType: "satellite",
+      
               })
             }
             className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 focus:ring-2 focus:ring-gray-400 focus:outline-none flex-1"
