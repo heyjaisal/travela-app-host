@@ -109,7 +109,6 @@ exports.addProperty = async (req, res) => {
     console.log(propertyData);
     
     
-    // Validate incoming data (optional, but recommended)
     if (!propertyData.address) {
       return res.status(400).json({ message: 'address feild is required' });
     }
@@ -129,8 +128,6 @@ exports.addProperty = async (req, res) => {
       return res.status(400).json({ message: 'location feild is required' });
     }
 
-    
-    // Create a new property document
     const newProperty = new Property(propertyData);
     await newProperty.save();
     
@@ -155,7 +152,6 @@ exports.eventproperty = async (req, res) => {
       address,
     } = req.body;
 
-    // Create a new Event document
     const newEvent = new Event({
       eventType,
       title,
@@ -168,7 +164,6 @@ exports.eventproperty = async (req, res) => {
       address,
     });
 
-    // Save event to the database
     await newEvent.save();
     res.status(201).json({ message: 'Event created successfully', event: newEvent });
   } catch (error) {

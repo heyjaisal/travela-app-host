@@ -349,8 +349,7 @@ const Events = () => {
         </div>
         <div className="relative z-10">
         <MapContainer
-          center={eventForm.location || { lat: 51.505, lng: -0.09 }} // Default to a valid location
-          zoom={15}
+          center={eventForm.location || { lat: 51.505, lng: -0.09 }} 
           style={{ height: "400px", width: "100%" }}
           onClick={handleMapClick}
         >
