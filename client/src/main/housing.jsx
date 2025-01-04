@@ -37,7 +37,7 @@ const Housing = () => {
       const result = response.data[0];
       if (result) {
         const { lat, lon, display_name } = result;
-        setEventForm({
+        sethouseData({
           ...houseData,
           location: { lat: parseFloat(lat), lng: parseFloat(lon) },
           address: display_name,
@@ -285,26 +285,35 @@ const Housing = () => {
         {/* Map */}
         <div className="relative z-10">
           <MapContainer
-                    center={houseData.location || { lat: 51.505, lng: -0.09 }} 
-                    style={{ height: "400px", width: "100%" }}
-                    onClick={handleMapClick}
-                  >
-                    {houseData.mapType === "satellite" ? (
-                      <TileLayer
-                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                        attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
-                      />
-                    ) : (
-                      <TileLayer
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        attribution="&copy; OpenStreetMap contributors"
-                      />
-                    )}
-                    <MapClick />
-                    <Marker position={houseData.location || { lat: 51.505, lng: -0.09 }}>
-                      <Popup>{houseData.address || "Default Address"}</Popup>
-                    </Marker>
-                  </MapContainer>
+            center={houseData.location || { lat: 51.505, lng: -0.09 }}
+            zoom={19}
+            scrollWheelZoom={true}
+            style={{ height: "400px", width: "100%" }}
+            onClick={handleMapClick}
+          >
+            {houseData.mapType === "satellite" && (
+              <>
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Tiles &copy; <a href="https://www.esri.com/">Esri</a>'
+                />
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Labels &copy; <a href="https://www.esri.com/">Esri</a>'
+                />
+              </>
+            )}
+            {houseData.mapType === "terrain" && (
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+              />
+            )}
+            <MapClick />
+            <Marker position={houseData.location || { lat: 51.505, lng: -0.09 }}>
+              <Popup>{houseData.address}</Popup>
+            </Marker>
+          </MapContainer>
         </div>
 
         <div className="mt-4">
@@ -317,24 +326,24 @@ const Housing = () => {
         <div className="flex space-x-4 mt-4">
           <button
             type="button"
-            onClick={() =>
+            onClick={() =>{
               sethouseData({
                 propertyType: "apartment",
-          size: "",
-          price: "",
-          description: "",
-          bedrooms: 0,
-          kitchen: 0,
-          bathrooms: 0,
-          maxGuests: 0,
-          maxStay: 0,
-          location: { lat: 51.505, lng: -0.09 },
-          address: "",
-          searchQuery: "",
-          mapType: "satellite",
-      
-              })
-            }
+                size: "",
+                price: "",
+                description: "",
+                bedrooms: 0,
+                kitchen: 0,
+                bathrooms: 0,
+                maxGuests: 0,
+                maxStay: 0,
+                location: { lat: 51.505, lng: -0.09 },
+                address: "",
+                searchQuery: "",
+                mapType: "satellite",
+              });
+              
+            }}
             className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 focus:ring-2 focus:ring-gray-400 focus:outline-none flex-1"
           >
             Cancel

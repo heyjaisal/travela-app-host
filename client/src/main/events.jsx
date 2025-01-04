@@ -347,30 +347,38 @@ const Events = () => {
             <FaMap />
           </button>
         </div>
-        <div className="relative z-10">
-        <MapContainer
-          center={eventForm.location || { lat: 51.505, lng: -0.09 }} 
-          style={{ height: "400px", width: "100%" }}
-          onClick={handleMapClick}
-        >
-          {eventForm.mapType === "satellite" ? (
-            <TileLayer
-              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-              attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
-            />
-          ) : (
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution="&copy; OpenStreetMap contributors"
-            />
-          )}
-          <MapClick />
-          <Marker position={eventForm.location || { lat: 51.505, lng: -0.09 }}>
-            <Popup>{eventForm.address || "Default Address"}</Popup>
-          </Marker>
-        </MapContainer>
-        </div>
-
+      <div className="relative z-10">
+                <MapContainer
+                  center={eventForm.location || { lat: 51.505, lng: -0.09 }}
+                  zoom={19}
+                  scrollWheelZoom={true}
+                  style={{ height: "400px", width: "100%" }}
+                  onClick={handleMapClick}
+                >
+                  {eventForm.mapType === "satellite" && (
+                    <>
+                      <TileLayer
+                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                        attribution='Tiles &copy; <a href="https://www.esri.com/">Esri</a>'
+                      />
+                      <TileLayer
+                        url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                        attribution='Labels &copy; <a href="https://www.esri.com/">Esri</a>'
+                      />
+                    </>
+                  )}
+                  {eventForm.mapType === "terrain" && (
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution="&copy; OpenStreetMap contributors"
+                    />
+                  )}
+                  <MapClick />
+                  <Marker position={eventForm.location || { lat: 51.505, lng: -0.09 }}>
+                    <Popup>{eventForm.address}</Popup>
+                  </Marker>
+                </MapContainer>
+              </div>
         <div className="mt-4">
           <p>Address: {eventForm.address}</p>
           <p>Latitude: {eventForm.location.lat}</p>
