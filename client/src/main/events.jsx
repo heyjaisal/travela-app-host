@@ -21,14 +21,12 @@ const Events = () => {
     maxGuests: 0,
     description: "",
     eventDateTime: null,
+    location: { lat: 51.505, lng: -0.09 },
+    address: "",
+    isFreeTicket: false,
+    searchQuery: "",
+    mapType: "satellite",
   });
-
-  const [location, setLocation] = useState({ lat: 51.505, lng: -0.09 });
-  const [address, setAddress] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [mapType, setMapType] = useState("satellite");
-
-  const [isFreeTicket, setIsFreeTicket] = useState(false);
 
   const handleEventChange = (e) => {
     const { name, value } = e.target;
@@ -39,16 +37,33 @@ const Events = () => {
     setEventForm({ ...eventForm, eventDateTime: dateTime });
   };
 
+  const handleFreeTicket = () => {
+    setEventForm((prev) => ({
+      ...prev,
+      isFreeTicket: true,
+      ticketPrice: 0,
+    }));
+  };
+  const maptype = () => {
+    setEventForm((prev) => ({
+      ...prev,
+      mapType: prev.mapType === "satellite" ? "terrain" : "satellite",
+    }));
+  };
+
   const handleSearch = async () => {
     try {
       const response = await axios.get(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${eventForm.searchQuery}`
       );
       const result = response.data[0];
       if (result) {
         const { lat, lon, display_name } = result;
-        setLocation({ lat: parseFloat(lat), lng: parseFloat(lon) });
-        setAddress(display_name);
+        setEventForm({
+          ...eventForm,
+          location: { lat: parseFloat(lat), lng: parseFloat(lon) },
+          address: display_name,
+        });
       }
     } catch (error) {
       console.error("Error fetching location:", error);
@@ -61,7 +76,7 @@ const Events = () => {
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
       );
       const { display_name } = response.data;
-      setAddress(display_name);
+      setEventForm((prev) => ({ ...prev, address: display_name }));
     } catch (error) {
       console.error("Error fetching address:", error);
     }
@@ -69,7 +84,7 @@ const Events = () => {
 
   const handleMapClick = async (event) => {
     const { lat, lng } = event.latlng;
-    setLocation({ lat, lng });
+    setEventForm((prev) => ({ ...prev, location: { lat, lng } }));
     fetchAddress(lat, lng);
   };
 
@@ -84,27 +99,21 @@ const Events = () => {
     }));
   };
 
-  const handleFreeTicket = () => {
-    setIsFreeTicket(true);
-    setEventForm((prev) => ({ ...prev, ticketPrice: "Free" }));
-  };
-
   const validateFields = () => {
     let tempErrors = {};
     if (!eventForm.title) tempErrors.title = "Title is required";
     if (!eventForm.eventVenue)
       tempErrors.eventVenue = "Event venue is required";
     if (
-      !isFreeTicket &&
+      !eventForm.isFreeTicket &&
       (!eventForm.ticketPrice || eventForm.ticketPrice <= 0) &&
-      eventForm.ticketPrice !== "Free"
-    ) {
+      eventForm.ticketPrice !== 0
+    )
       tempErrors.ticketPrice =
-        "Ticket price must be a number greater than zero or 'Free'";
-    }
+        "Ticket price must be greater than zero or 'Free'";
     if (!eventForm.description)
       tempErrors.description = "Description is required";
-    if (!location.lat || !location.lng)
+    if (!eventForm.location.lat || !eventForm.location.lng)
       tempErrors.location = "Location is required";
     if (!eventForm.eventDateTime)
       tempErrors.eventDateTime = "Event date and time are required";
@@ -116,13 +125,24 @@ const Events = () => {
     e.preventDefault();
     if (validateFields()) {
       try {
-        const submissionData = { ...eventForm, location, address };
         const response = await axios.post(
           "http://localhost:5000/api/events",
-          submissionData
+          eventForm
         );
         console.log("Success:", response.data);
         toast.success("Event details submitted successfully!");
+        setEventForm({
+          eventType: "concert",
+          title: "",
+          eventVenue: "",
+          ticketPrice: 0,
+          maxGuests: 0,
+          description: "",
+          eventDateTime: null,
+          location: { lat: 51.505, lng: -0.09 },
+          address: "",
+          isFreeTicket: false,
+        });
       } catch (error) {
         console.error("Error:", error);
         toast.error("Failed to submit event details.");
@@ -131,10 +151,7 @@ const Events = () => {
   };
 
   const MapClick = () => {
-    useMapEvent("click", (e) => {
-      setLocation({ lat: e.latlng.lat, lng: e.latlng.lng });
-      fetchAddress(e.latlng.lat, e.latlng.lng);
-    });
+    useMapEvent("click", handleMapClick);
     return null;
   };
 
@@ -206,14 +223,17 @@ const Events = () => {
               <input
                 type="number"
                 name="ticketPrice"
-                value={isFreeTicket ? "Free" : eventForm.ticketPrice}
+                value={eventForm.isFreeTicket ? 0 : eventForm.ticketPrice}
                 onChange={handleEventChange}
-                disabled={isFreeTicket}
+                disabled={eventForm.isFreeTicket}
                 placeholder={
-                  isFreeTicket ? "Free Ticket" : "Enter the ticket price"
+                  eventForm.isFreeTicket
+                    ? "Free Ticket"
+                    : "Enter the ticket price"
                 }
                 className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
               />
+
               <button
                 type="button"
                 onClick={handleFreeTicket}
@@ -221,12 +241,10 @@ const Events = () => {
               >
                 Free
               </button>
-              {errors.ticketPrice && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.ticketPrice}
-                </p>
-              )}
             </div>
+            {errors.ticketPrice && (
+              <p className="text-red-500 text-sm mt-1">{errors.ticketPrice}</p>
+            )}
           </div>
 
           <div className="mb-4">
@@ -257,7 +275,7 @@ const Events = () => {
               sx={{ width: "100%" }}
               value={eventForm.eventDateTime}
               onChange={handleDateTimeChange}
-              renderInput={(params) => (
+              textFeild={(params) => (
                 <input
                   {...params}
                   className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-700 focus:outline-none text-pink-900"
@@ -305,11 +323,14 @@ const Events = () => {
 
       {/* Map Section */}
       <div>
-        <div className="flex items-center mb-2">
+        <h2 className="text-lg font-semibold mb-4">Pin point your location</h2>
+
+        <div className="flex items-center mb-4">
           <input
             type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            name="searchQuery"
+            value={eventForm.searchQuery}
+            onChange={handleEventChange}
             placeholder="Search for a place"
             className="py-2 px-3 border border-gray-300 rounded-lg mr-2 w-48"
           />
@@ -320,24 +341,20 @@ const Events = () => {
             Search
           </button>
           <button
-            onClick={() =>
-              setMapType((prev) =>
-                prev === "satellite" ? "terrain" : "satellite"
-              )
-            }
+            onClick={maptype}
             className="text-xl bg-white p-2 rounded-full shadow-md ml-3"
           >
             <FaMap />
           </button>
         </div>
-
+        <div className="relative z-10">
         <MapContainer
-          center={location}
+          center={eventForm.location || { lat: 51.505, lng: -0.09 }} // Default to a valid location
           zoom={15}
           style={{ height: "400px", width: "100%" }}
           onClick={handleMapClick}
         >
-          {mapType === "satellite" ? (
+          {eventForm.mapType === "satellite" ? (
             <TileLayer
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
               attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
@@ -349,15 +366,16 @@ const Events = () => {
             />
           )}
           <MapClick />
-          <Marker position={location}>
-            <Popup>{address}</Popup>
+          <Marker position={eventForm.location || { lat: 51.505, lng: -0.09 }}>
+            <Popup>{eventForm.address || "Default Address"}</Popup>
           </Marker>
         </MapContainer>
+        </div>
 
         <div className="mt-4">
-          <p>Address: {address}</p>
-          <p>Latitude: {location.lat}</p>
-          <p>Longitude: {location.lng}</p>
+          <p>Address: {eventForm.address}</p>
+          <p>Latitude: {eventForm.location.lat}</p>
+          <p>Longitude: {eventForm.location.lng}</p>
         </div>
         <div className="flex space-x-4 mt-4">
           <button
@@ -370,8 +388,13 @@ const Events = () => {
                 ticketPrice: 0,
                 maxGuests: 0,
                 description: "",
+                eventDateTime: null,
+                location: { lat: 51.505, lng: -0.09 },
+                address: "",
+                isFreeTicket: true,
+                searchQuery: "",
+                mapType: "satellite",
               });
-              setIsFreeTicket(false);
             }}
             className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 focus:ring-2 focus:ring-gray-400 focus:outline-none flex-1"
           >

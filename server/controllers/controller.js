@@ -141,16 +141,21 @@ exports.addProperty = async (req, res) => {
   }
 };
 
-exports.eventproperty =  async (req, res) => {
+exports.eventproperty = async (req, res) => {
   try {
-    const { eventType, title, eventVenue, ticketPrice, maxGuests, description, location, address } = req.body;
-    console.log(req.body);
-    
+    const {
+      eventType,
+      title,
+      eventVenue,
+      ticketPrice,
+      maxGuests,
+      description,
+      eventDateTime,
+      location,
+      address,
+    } = req.body;
 
-    if (!eventType || !title || !eventVenue || !ticketPrice || !maxGuests || !location || !address) {
-      return res.status(400).json({ error: "All fields are required." });
-    }
-
+    // Create a new Event document
     const newEvent = new Event({
       eventType,
       title,
@@ -158,14 +163,16 @@ exports.eventproperty =  async (req, res) => {
       ticketPrice,
       maxGuests,
       description,
+      eventDateTime,
       location,
       address,
     });
 
-    const savedEvent = await newEvent.save();
-    res.status(201).json(savedEvent);
+    // Save event to the database
+    await newEvent.save();
+    res.status(201).json({ message: 'Event created successfully', event: newEvent });
   } catch (error) {
     console.error("Error creating event:", error);
-    res.status(500).json({ error: "Failed to create event." });
+    res.status(500).json({ message: "Failed to create event" });
   }
 };
