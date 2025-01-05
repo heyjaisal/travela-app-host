@@ -7,12 +7,16 @@ import {
   Popup,
   useMapEvent,
 } from "react-leaflet";
-import { FaMap } from "react-icons/fa";
+import { FaMap,FaTrash ,FaEdit } from "react-icons/fa";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { ToastContainer, toast } from "react-toastify";
 
 const Events = () => {
   const [errors, setErrors] = useState({});
+  const [features, setfeatures] = useState([]);
+  const [featurestext, setfeaturestext] = useState("");
+  const [editfeatures, setEditfeatures] = useState(null);
+
   const [eventForm, setEventForm] = useState({
     eventType: "concert",
     title: "",
@@ -68,6 +72,36 @@ const Events = () => {
     } catch (error) {
       console.error("Error fetching location:", error);
     }
+  };
+
+  const handleAddTodo = () => {
+    if (featurestext.trim() === "") return;
+
+    if (editfeatures) {
+      setfeatures(
+        features.map((todo) =>
+          todo.id === editfeatures ? { ...todo, text: featurestext } : todo
+        )
+      );
+      setEditfeatures(null);
+    } else {
+      const newTodo = {
+        id: Date.now(),
+        text: featurestext.trim(),
+      };
+      setfeatures([...features, newTodo]);
+    }
+    setfeaturestext(""); 
+  };
+
+  const handleEditTodo = (id) => {
+    const todoToEdit = features.find((todo) => todo.id === id);
+    setfeaturestext(todoToEdit.text); 
+    setEditfeatures(id); 
+  };
+
+  const handleDeleteTodo = (id) => {
+    setfeatures(features.filter((todo) => todo.id !== id));
   };
 
   const fetchAddress = async (lat, lng) => {
@@ -319,6 +353,53 @@ const Events = () => {
             </div>
           </div>
         </form>
+        <div className="mb-4">
+          <label className="block text-sm font-poppins font-bold text-gray-700">
+            Add new features
+          </label>
+          <div className="flex">
+            <input
+              type="text"
+              value={featurestext}
+              onChange={(e) => setfeaturestext(e.target.value)}
+              placeholder={editfeatures ? "Edit feature" : "Enter a new feature"}
+              className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={handleAddTodo}
+              className="ml-4 mt-2 p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              {editfeatures ? "Save" : "Add"}
+            </button>
+          </div>
+        </div>
+        <ul>
+          {features.map((todo) => (
+            <li
+              key={todo.id}
+              className="flex justify-between items-center mt-2 p-3 bg-gray-100 rounded-lg shadow-sm"
+            >
+              <span className="cursor-pointer text-gray-800">{todo.text}</span>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => handleEditTodo(todo.id)}
+                  className="text-blue-500 hover:text-blue-700 focus:outline-none"
+                  title="Edit"
+                >
+                  <FaEdit className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => handleDeleteTodo(todo.id)}
+                  className="text-red-500 hover:text-red-700 focus:outline-none"
+                  title="Delete"
+                >
+                  <FaTrash className="w-5 h-5" />
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
 
       {/* Map Section */}
@@ -347,38 +428,40 @@ const Events = () => {
             <FaMap />
           </button>
         </div>
-      <div className="relative z-10">
-                <MapContainer
-                  center={eventForm.location || { lat: 51.505, lng: -0.09 }}
-                  zoom={19}
-                  scrollWheelZoom={true}
-                  style={{ height: "400px", width: "100%" }}
-                  onClick={handleMapClick}
-                >
-                  {eventForm.mapType === "satellite" && (
-                    <>
-                      <TileLayer
-                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                        attribution='Tiles &copy; <a href="https://www.esri.com/">Esri</a>'
-                      />
-                      <TileLayer
-                        url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
-                        attribution='Labels &copy; <a href="https://www.esri.com/">Esri</a>'
-                      />
-                    </>
-                  )}
-                  {eventForm.mapType === "terrain" && (
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      attribution="&copy; OpenStreetMap contributors"
-                    />
-                  )}
-                  <MapClick />
-                  <Marker position={eventForm.location || { lat: 51.505, lng: -0.09 }}>
-                    <Popup>{eventForm.address}</Popup>
-                  </Marker>
-                </MapContainer>
-              </div>
+        <div className="relative z-10">
+          <MapContainer
+            center={eventForm.location || { lat: 51.505, lng: -0.09 }}
+            zoom={19}
+            scrollWheelZoom={true}
+            style={{ height: "400px", width: "100%" }}
+            onClick={handleMapClick}
+          >
+            {eventForm.mapType === "satellite" && (
+              <>
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Tiles &copy; <a href="https://www.esri.com/">Esri</a>'
+                />
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Labels &copy; <a href="https://www.esri.com/">Esri</a>'
+                />
+              </>
+            )}
+            {eventForm.mapType === "terrain" && (
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+              />
+            )}
+            <MapClick />
+            <Marker
+              position={eventForm.location || { lat: 51.505, lng: -0.09 }}
+            >
+              <Popup>{eventForm.address}</Popup>
+            </Marker>
+          </MapContainer>
+        </div>
         <div className="mt-4">
           <p>Address: {eventForm.address}</p>
           <p>Latitude: {eventForm.location.lat}</p>
