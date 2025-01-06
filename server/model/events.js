@@ -1,30 +1,23 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
   eventType: {
     type: String,
-    required: true,
     enum: [
-      "concert",
-      "conference",
-      "workshop",
-      "seminar",
-      "meetup",
-      "party",
-      "festival",
-      "wedding",
-      "webinar",
-      "charity-event",
-      "other",
+      'concert', 'conference', 'workshop', 'seminar', 'meetup', 'party', 
+      'festival', 'wedding', 'webinar', 'charity-event', 'other'
     ],
+    required: true,
   },
   title: {
     type: String,
     required: true,
+    trim: true,
   },
   eventVenue: {
     type: String,
     required: true,
+    trim: true,
   },
   ticketPrice: {
     type: Number,
@@ -36,9 +29,15 @@ const eventSchema = new mongoose.Schema({
     required: true,
     min: 1,
   },
+  ticketsSold: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
   description: {
     type: String,
     required: true,
+    trim: true,
   },
   eventDateTime: {
     type: Date,
@@ -57,12 +56,31 @@ const eventSchema = new mongoose.Schema({
   address: {
     type: String,
     required: true,
+    trim: true,
+  },
+  features: [{
+    text: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+  }],
+  couponCode: {
+    type: String,
+    trim: true,
+  },
+  discountPercentage: {
+    type: Number,
+    min: 0,
+    max: 100,
   },
   host: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Host", // Reference to the Host model
+    ref: 'Host',  // Reference to the User model
     required: true,
   },
 }, { timestamps: true });
 
-module.exports = mongoose.model("Event", eventSchema);
+const Event = mongoose.model('Event', eventSchema);
+
+module.exports = Event;

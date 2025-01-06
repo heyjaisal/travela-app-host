@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Cookies from 'js-cookie';
 import axios from "axios";
 import {
   MapContainer,
@@ -157,12 +158,32 @@ const Events = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (validateFields()) {
       try {
+        let token = localStorage.getItem('token');  // Check localStorage first
+        if (!token) {
+          token = Cookies.get('connect.sid');  // If not found in localStorage, check cookies
+        }
+  
+        if (!token) {
+          toast.error("No token found. Please log in.");
+          return;
+        }
+  
         const response = await axios.post(
-          "http://localhost:5000/api/events",
-          eventForm
+          "http://localhost:5000/api/events", 
+          {
+            event: eventForm,  // event data
+            features: features,  // features list
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`  // Include the token in the Authorization header
+            }
+          }
         );
+        
         console.log("Success:", response.data);
         toast.success("Event details submitted successfully!");
         setEventForm({
@@ -177,12 +198,14 @@ const Events = () => {
           address: "",
           isFreeTicket: false,
         });
+        setfeatures([]);
       } catch (error) {
         console.error("Error:", error);
         toast.error("Failed to submit event details.");
       }
     }
   };
+  
 
   const MapClick = () => {
     useMapEvent("click", handleMapClick);

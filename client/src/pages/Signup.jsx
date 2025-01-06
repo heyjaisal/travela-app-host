@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,13 +15,28 @@ const Signup = () => {
   const [error, setError] = useState('');
   const [showOtpPopup, setShowOtpPopup] = useState(false);
 
+  useEffect(() => {
+    // Load the Google API script
+    const script = document.createElement('script');
+    script.src = 'https://apis.google.com/js/platform.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    script.onload = () => {
+      window.gapi.load('auth2', () => {
+        window.gapi.auth2.init({
+          client_id: 'YOUR_GOOGLE_CLIENT_ID',
+        });
+      });
+    };
+  }, []);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
-
     if (!formData.name || !formData.email || !formData.country || !formData.password || !formData.cpassword) {
       return setError('Please fill out all fields.');
     }
@@ -42,7 +57,10 @@ const Signup = () => {
     try {
       const response = await axios.post('http://localhost:5000/api/verify-otp', formData);
       if (response.status === 201) {
-        navigate('/login');
+        // Save JWT token in localStorage and sessionStorage after successful signup
+        localStorage.setItem('token', response.data.token);
+        sessionStorage.setItem('token', response.data.token);
+        navigate('/login'); // Redirect to login after successful signup
       }
       setShowOtpPopup(false);
     } catch (error) {
@@ -50,9 +68,33 @@ const Signup = () => {
     }
   };
 
-  // Google Signup Handler
-  const handleGoogleSignup = () => {
-    window.location.href = 'http://localhost:5000/auth/google';
+  const handleGoogleSignup = async (response) => {
+    if (response.error) {
+      setError('Google login failed. Please try again.');
+      return;
+    }
+
+    const { email, name, googleId } = response.profileObj;
+
+    try {
+      // Check if the user exists in the system based on email
+      const res = await axios.post('http://localhost:5000/api/check-user', { email });
+
+      if (res.status === 200) {
+        // User exists, redirect to home page
+        localStorage.setItem('token', res.data.token);
+        sessionStorage.setItem('token', res.data.token);
+        navigate('/home');
+      } else if (res.status === 404) {
+        // New user, create account
+        await axios.post('http://localhost:5000/api/signup', { name, email, googleId });
+        localStorage.setItem('token', res.data.token);
+        sessionStorage.setItem('token', res.data.token);
+        navigate('/home');
+      }
+    } catch (error) {
+      setError('An error occurred. Please try again.');
+    }
   };
 
   return (
@@ -147,8 +189,9 @@ const Signup = () => {
             <hr className="w-1/4 border-gray-300" />
           </div>
 
+          {/* Google SignUp/Login Button */}
           <button
-            onClick={handleGoogleSignup}
+            onClick={() => window.gapi.auth2.getAuthInstance().signIn().then(handleGoogleSignup)}
             type="button"
             className="w-full flex items-center justify-center border border-gray-300 py-2 rounded-lg hover:bg-gray-100"
           >
@@ -157,7 +200,7 @@ const Signup = () => {
               alt="Google Logo"
               className="mr-2"
             />
-            Sign Up with Google
+            Sign Up / Login with Google
           </button>
         </form>
       </div>

@@ -139,35 +139,25 @@ exports.addProperty = async (req, res) => {
 };
 
 exports.eventproperty = async (req, res) => {
+  const { event, features } = req.body;
+
+  console.log(req.body);
+
+  // Access the user._id from the middleware (req.user)
+  const userId = req.user._id;  // This should have been set in the authenticate middleware
+
+  // Save event and features to the database
+  const newEvent = new Event({
+    ...event,  // event data
+    features: features,  // features list
+    host: userId,  // Set the host to the user's ID
+  });
+
   try {
-    const {
-      eventType,
-      title,
-      eventVenue,
-      ticketPrice,
-      maxGuests,
-      description,
-      eventDateTime,
-      location,
-      address,
-    } = req.body;
-
-    const newEvent = new Event({
-      eventType,
-      title,
-      eventVenue,
-      ticketPrice,
-      maxGuests,
-      description,
-      eventDateTime,
-      location,
-      address,
-    });
-
     await newEvent.save();
-    res.status(201).json({ message: 'Event created successfully', event: newEvent });
+    res.status(201).json(newEvent);
   } catch (error) {
-    console.error("Error creating event:", error);
-    res.status(500).json({ message: "Failed to create event" });
+    console.error(error);
+    res.status(500).json({ error: "Failed to save event" });
   }
 };

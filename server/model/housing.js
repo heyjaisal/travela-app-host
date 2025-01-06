@@ -21,7 +21,14 @@ const propertySchema = new mongoose.Schema({
   address: { type: String, required: true },
   country: { type: String, required: true },
   city: { type: String, required: true },
-  images: [{ type: String }], // Optional: URLs or file paths for property images
+  images: [{ type: String }],
+  features: [{
+    text: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+  }], // Optional: URLs or file paths for property images
   host: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Host', // Reference to the Host model
