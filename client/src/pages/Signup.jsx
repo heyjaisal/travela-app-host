@@ -15,21 +15,6 @@ const Signup = () => {
   const [error, setError] = useState('');
   const [showOtpPopup, setShowOtpPopup] = useState(false);
 
-  useEffect(() => {
-    // Load the Google API script
-    const script = document.createElement('script');
-    script.src = 'https://apis.google.com/js/platform.js';
-    script.async = true;
-    document.body.appendChild(script);
-
-    script.onload = () => {
-      window.gapi.load('auth2', () => {
-        window.gapi.auth2.init({
-          client_id: 'YOUR_GOOGLE_CLIENT_ID',
-        });
-      });
-    };
-  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -68,34 +53,12 @@ const Signup = () => {
     }
   };
 
-  const handleGoogleSignup = async (response) => {
-    if (response.error) {
-      setError('Google login failed. Please try again.');
-      return;
-    }
-
-    const { email, name, googleId } = response.profileObj;
-
-    try {
-      // Check if the user exists in the system based on email
-      const res = await axios.post('http://localhost:5000/api/check-user', { email });
-
-      if (res.status === 200) {
-        // User exists, redirect to home page
-        localStorage.setItem('token', res.data.token);
-        sessionStorage.setItem('token', res.data.token);
-        navigate('/home');
-      } else if (res.status === 404) {
-        // New user, create account
-        await axios.post('http://localhost:5000/api/signup', { name, email, googleId });
-        localStorage.setItem('token', res.data.token);
-        sessionStorage.setItem('token', res.data.token);
-        navigate('/home');
-      }
-    } catch (error) {
-      setError('An error occurred. Please try again.');
-    }
+  const handleGoogleSignup = () => {
+    window.location.href = 'http://localhost:5000/auth/google';
   };
+
+
+  
 
   return (
     <div className="flex h-screen">
@@ -191,7 +154,7 @@ const Signup = () => {
 
           {/* Google SignUp/Login Button */}
           <button
-            onClick={() => window.gapi.auth2.getAuthInstance().signIn().then(handleGoogleSignup)}
+            onClick={handleGoogleSignup}
             type="button"
             className="w-full flex items-center justify-center border border-gray-300 py-2 rounded-lg hover:bg-gray-100"
           >
