@@ -5,15 +5,12 @@ const Host = require('../model/profile');
 const router = express.Router();
 require('dotenv').config();
 
-// Ensure environment variables are set
 if (!process.env.JWT_SECRET || !process.env.CLIENT_URL) {
   throw new Error('Missing required environment variables: JWT_SECRET or CLIENT_URL');
 }
 
-// Google OAuth route
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// Google OAuth callback route
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/auth/login/failed' }), async (req, res) => {
   if (!req.user) return res.redirect('/auth/login/failed');
 
@@ -47,7 +44,6 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
   }
 });
 
-// Login failure route
 router.get('/auth/login/failed', (req, res) => {
   res.status(401).json({ message: 'Login failed' });
 });

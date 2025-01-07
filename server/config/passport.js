@@ -3,7 +3,6 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const Host = require('../model/profile');
 require('dotenv').config();
 
-// Validate environment variables
 if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
   throw new Error('Google OAuth credentials not found.');
 }
@@ -39,7 +38,6 @@ passport.use(
   )
 );
 
-// Serialize and deserialize user for sessions
 passport.serializeUser((user, done) => done(null, user.id));
 
 passport.deserializeUser(async (id, done) => {

@@ -47,7 +47,7 @@ exports.verifyOtp = async (req, res) => {
       }
   
      
-      const otpAge = (new Date() - otpDoc.createdAt) / 1000 / 60; // Age in minutes
+      const otpAge = (new Date() - otpDoc.createdAt) / 1000 / 60; 
       if (otpAge > 5) {
         return res.status(400).json({ error: "Expired OTP" });
       }
@@ -91,12 +91,12 @@ exports.verifyOtp = async (req, res) => {
             }
         );
 
-        // Set the JWT token in a session cookie
+  
         res.cookie('auth_token', token, {
-            httpOnly: true,  // Ensures the cookie is not accessible via JavaScript
-            secure: process.env.NODE_ENV === 'production',  // Use secure cookies only over HTTPS
-            sameSite: 'Strict',  // Prevents CSRF attacks
-            maxAge: 3600000,  // 1 hour expiration time
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', 
+            sameSite: 'Strict',  
+            maxAge: 3600000,  
         });
 
         res.status(200).json({
@@ -149,14 +149,13 @@ exports.eventproperty = async (req, res) => {
 
   console.log(req.body);
 
-  // Access the user._id from the middleware (req.user)
-  const userId = req.user._id;  // This should have been set in the authenticate middleware
+  const userId = req.user._id;  
 
-  // Save event and features to the database
+ 
   const newEvent = new Event({
-    ...event,  // event data
-    features: features,  // features list
-    host: userId,  // Set the host to the user's ID
+    ...event,  
+    features: features,  
+    host: userId, 
   });
 
   try {
