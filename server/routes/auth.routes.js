@@ -32,10 +32,13 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
 
     const token = jwt.sign({ id: host._id, role: host.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
     res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      httpOnly: true,               
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax', 
+      maxAge: 60 * 60 * 24 * 7 * 1000,         
+      path: '/',                               
     });
+    
 
     res.redirect(`${process.env.CLIENT_URL}/home`);
   } catch (error) {

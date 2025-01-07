@@ -114,25 +114,6 @@ exports.addProperty = async (req, res) => {
     const propertyData = req.body;
     console.log(propertyData);
     
-    
-    if (!propertyData.address) {
-      return res.status(400).json({ message: 'address feild is required' });
-    }
-    if (!propertyData.propertyType) {
-      return res.status(400).json({ message: 'propertyType feild is required' });
-    }
-    if (!propertyData.size) {
-      return res.status(400).json({ message: 'size feild is required' });
-    }
-    if (!propertyData.price) {
-      return res.status(400).json({ message: 'price feild is required' });
-    }
-    if (!propertyData.description) {
-      return res.status(400).json({ message: 'description feild is required' });
-    }
-    if (!propertyData.location) {
-      return res.status(400).json({ message: 'location feild is required' });
-    }
 
     const newProperty = new Property(propertyData);
     await newProperty.save();
@@ -145,17 +126,21 @@ exports.addProperty = async (req, res) => {
 };
 
 exports.eventproperty = async (req, res) => {
+
+
   const { event, features } = req.body;
 
   console.log(req.body);
 
-  const userId = req.user._id;  
+  const userId = req.user.id;
 
- 
+  console.log(userId);
+  
+
   const newEvent = new Event({
-    ...event,  
-    features: features,  
-    host: userId, 
+    ...event, 
+    features: features, 
+    host: userId,
   });
 
   try {
@@ -163,6 +148,6 @@ exports.eventproperty = async (req, res) => {
     res.status(201).json(newEvent);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to save event" });
+    res.status(500).json({ error: 'Failed to save event' });
   }
 };
