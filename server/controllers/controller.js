@@ -92,11 +92,13 @@ exports.verifyOtp = async (req, res) => {
         );
 
   
-        res.cookie('auth_token', token, {
+        res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production', 
             sameSite: 'Strict',  
-            maxAge: 3600000,  
+            maxAge: 60 * 60 * 24 * 7 * 1000,
+            path: '/',
+  
         });
 
         res.status(200).json({
