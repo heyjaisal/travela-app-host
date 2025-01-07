@@ -70,7 +70,6 @@ exports.verifyOtp = async (req, res) => {
     console.log(req.body);
 
     try {
-        
         const user = await Host.findOne({ email, role: 'user' });
         if (!user) {
             return res.status(400).json({ error: 'email not found' });
@@ -92,9 +91,16 @@ exports.verifyOtp = async (req, res) => {
             }
         );
 
+        // Set the JWT token in a session cookie
+        res.cookie('auth_token', token, {
+            httpOnly: true,  // Ensures the cookie is not accessible via JavaScript
+            secure: process.env.NODE_ENV === 'production',  // Use secure cookies only over HTTPS
+            sameSite: 'Strict',  // Prevents CSRF attacks
+            maxAge: 3600000,  // 1 hour expiration time
+        });
+
         res.status(200).json({
             message: 'login successful',
-            token,
             user: { name: user.name, email: user.email, country: user.country },
         });
     } catch (error) {

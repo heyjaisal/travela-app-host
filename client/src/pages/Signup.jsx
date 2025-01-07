@@ -42,10 +42,7 @@ const Signup = () => {
     try {
       const response = await axios.post('http://localhost:5000/api/verify-otp', formData);
       if (response.status === 201) {
-        // Save JWT token in localStorage and sessionStorage after successful signup
-        localStorage.setItem('token', response.data.token);
-        sessionStorage.setItem('token', response.data.token);
-        navigate('/login'); // Redirect to login after successful signup
+        navigate('/login');
       }
       setShowOtpPopup(false);
     } catch (error) {
@@ -57,8 +54,6 @@ const Signup = () => {
     window.location.href = 'http://localhost:5000/auth/google';
   };
 
-
-  
 
   return (
     <div className="flex h-screen">

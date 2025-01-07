@@ -357,6 +357,7 @@ const Housing = () => {
         <div className="flex items-center mb-2">
           <input
             type="text"
+            name="searchQuery"
             value={houseData.searchQuery}
             onChange={handleInputChange}
             placeholder="Search for a place"

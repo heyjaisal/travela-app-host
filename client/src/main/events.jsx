@@ -137,8 +137,7 @@ const Events = () => {
   const validateFields = () => {
     let tempErrors = {};
     if (!eventForm.title) tempErrors.title = "Title is required";
-    if (!eventForm.eventVenue)
-      tempErrors.eventVenue = "Event venue is required";
+    if (!eventForm.eventVenue) tempErrors.eventVenue = "Event venue is required";
     if (
       !eventForm.isFreeTicket &&
       (!eventForm.ticketPrice || eventForm.ticketPrice <= 0) &&
@@ -146,67 +145,61 @@ const Events = () => {
     )
       tempErrors.ticketPrice =
         "Ticket price must be greater than zero or 'Free'";
-    if (!eventForm.description)
-      tempErrors.description = "Description is required";
+    if (!eventForm.description) tempErrors.description = "Description is required";
     if (!eventForm.location.lat || !eventForm.location.lng)
       tempErrors.location = "Location is required";
     if (!eventForm.eventDateTime)
       tempErrors.eventDateTime = "Event date and time are required";
+    else if (eventForm.eventDateTime < new Date()) {
+      tempErrors.eventDateTime = "Event date and time must be in the future";
+    }
+    if (features.length === 0) {
+      tempErrors.features = "At least one feature is required";
+    }
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (validateFields()) {
-      try {
-        let token = localStorage.getItem('token');  // Check localStorage first
-        if (!token) {
-          token = Cookies.get('connect.sid');  // If not found in localStorage, check cookies
-        }
-  
-        if (!token) {
-          toast.error("No token found. Please log in.");
-          return;
-        }
-  
-        const response = await axios.post(
-          "http://localhost:5000/api/events", 
-          {
-            event: eventForm,  // event data
-            features: features,  // features list
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`  // Include the token in the Authorization header
-            }
-          }
-        );
-        
-        console.log("Success:", response.data);
-        toast.success("Event details submitted successfully!");
-        setEventForm({
-          eventType: "concert",
-          title: "",
-          eventVenue: "",
-          ticketPrice: 0,
-          maxGuests: 0,
-          description: "",
-          eventDateTime: null,
-          location: { lat: 51.505, lng: -0.09 },
-          address: "",
-          isFreeTicket: false,
-        });
-        setfeatures([]);
-      } catch (error) {
-        console.error("Error:", error);
-        toast.error("Failed to submit event details.");
-      }
-    }
-  };
-  
 
+    if (validateFields()) {
+        try {
+            const response = await axios.post(
+                "http://localhost:5000/api/events", 
+                {
+                    event: eventForm,
+                    features: features,
+                },
+                {
+                    withCredentials: true,  // Ensure cookies are sent with the request
+                }
+            );
+
+            console.log("Success:", response.data);
+            toast.success("Event details submitted successfully!");
+            setEventForm({
+                eventType: "concert",
+                title: "",
+                eventVenue: "",
+                ticketPrice: 0,
+                maxGuests: 0,
+                description: "",
+                eventDateTime: null,
+                location: { lat: 51.505, lng: -0.09 },
+                address: "",
+                isFreeTicket: false,
+            });
+            setfeatures([]);
+        } catch (error) {
+            console.error("Error:", error);
+            toast.error("Failed to submit event details.");
+        }
+    }
+};
+
+  
   const MapClick = () => {
     useMapEvent("click", handleMapClick);
     return null;

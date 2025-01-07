@@ -10,12 +10,13 @@ require('dotenv').config();
 const app = express();
 
 // Validate required environment variables
-if (!process.env.MONGO_URI || !process.env.SESSION_SECRET) {
+const { MONGO_URI, SESSION_SECRET, CLIENT_URL, PORT } = process.env;
+if (!MONGO_URI || !SESSION_SECRET) {
   throw new Error('MongoDB URI or Session Secret is missing in environment variables.');
 }
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(MONGO_URI)
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log('MongoDB connection error:', err));
 
@@ -26,18 +27,17 @@ app.use(express.json());
 require('./config/passport'); // Ensure passport is initialized before routes
 
 // CORS setup
-const corsOptions = {
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+app.use(cors({
+  origin: CLIENT_URL || 'http://localhost:5173',
   credentials: true,
-};
-app.use(cors(corsOptions));
+}));
 
 // Session handling
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-session-secret',
+  secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production' }
+  cookie: { secure: process.env.NODE_ENV === 'production' },
 }));
 
 // Passport setup
@@ -49,7 +49,7 @@ app.use('/api', authRoutes);  // API routes for additional endpoints
 app.use(authRoute);  // Authentication routes
 
 // Start the server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const port = PORT || 5000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
