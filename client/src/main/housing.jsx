@@ -158,6 +158,7 @@ const Housing = () => {
           searchQuery: "",
           mapType: "satellite",
         }); 
+        setfeatures([]);
       } catch (error) {
         console.error("Error:", error);
         toast.error("Failed to submit property details."); 
@@ -172,7 +173,6 @@ const Housing = () => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      {/* Left Section */}
       <div>
         <h2 className="text-lg font-semibold mb-4">Property Details</h2>
         <form onSubmit={housingSubmit}>

@@ -28,10 +28,10 @@ const propertySchema = new mongoose.Schema({
       required: true,
       trim: true,
     },
-  }], // Optional: URLs or file paths for property images
+  }], 
   host: { 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Host', // Reference to the Host model
+    ref: 'Host',
     required: true 
   },
 }, { timestamps: true });

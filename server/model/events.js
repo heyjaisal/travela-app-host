@@ -76,7 +76,7 @@ const eventSchema = new mongoose.Schema({
   },
   host: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Host',  // Reference to the User model
+    ref: 'Host',  
     required: true,
   },
 }, { timestamps: true });

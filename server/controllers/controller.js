@@ -112,16 +112,19 @@ exports.verifyOtp = async (req, res) => {
 exports.addProperty = async (req, res) => {
   try {
     const propertyData = req.body;
-    console.log(propertyData);
-    
+    const userId = req.user._id; 
 
-    const newProperty = new Property(propertyData);
+    const newProperty = new Property({
+      ...propertyData,
+      host: userId,
+    });
+
     await newProperty.save();
     
     res.status(201).json({ message: 'Property added successfully', property: newProperty });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Failed to add property', error: error.message });
+    res.status(500).json({ message: 'Failed to add property', error: error.message || 'Unknown error' });
   }
 };
 
