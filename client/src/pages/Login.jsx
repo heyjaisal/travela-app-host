@@ -76,7 +76,7 @@ const Login = () => {
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = "http://localhost:5000/auth/google"; // Redirect user to your backend for Google OAuth
+    window.location.href = "http://localhost:5000/auth/google";
   };
   
 

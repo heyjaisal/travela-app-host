@@ -24,7 +24,7 @@ passport.use(
             email: profile.emails?.[0]?.value || 'no-email@google.com',
             googleId: profile.id,
             profileImage: profile.photos[0]?.value || '/no-profile-picture.jpg',
-            googleToken: token, // Store the token if needed for later use
+            googleToken: token,
           });
           await newHost.save();
           return done(null, newHost);

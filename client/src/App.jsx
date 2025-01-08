@@ -12,6 +12,7 @@ import Signup from './pages/Signup';
 import Payment from './pages/payment';  
 import Profile from './pages/profile';
 import Adminlayout from './components/Navbar/Admin-layout'
+import PrivateRoute from './components/utils/Privatroute';
 
 const App = () => {
   return (
@@ -23,14 +24,14 @@ const App = () => {
         <Route path ='/signup' element={<Signup/>}/>
 
         <Route element={<Adminlayout/>}>
-          <Route path ='/home' element={<Home/>}/>
-          <Route path ='/create' element={<Create/>}/>
-          <Route path ='/hosted' element={<Hosted/>}/>
-          <Route path ='/booking' element={<Booking/>}/>
-          <Route path ='/messages' element={<Messages/>}/>
-          <Route path ='/notifications' element={<Notification/>}/>
-          <Route path ='/payment' element={<Payment/>}/>
-          <Route path ='/profile' element={<Profile/>}/>
+          <Route path ='/home' element={<PrivateRoute allowedRoles={['host']}><Home /></PrivateRoute>}/>
+          <Route path ='/create' element={<PrivateRoute allowedRoles={['host']}><Create/></PrivateRoute>}/>
+          <Route path ='/hosted' element={<PrivateRoute allowedRoles={['host']}> <Hosted/> </PrivateRoute>}/>
+          <Route path ='/booking' element={<PrivateRoute allowedRoles={['host']}><Booking/></PrivateRoute>}/>
+          <Route path ='/messages' element={<PrivateRoute allowedRoles={['host']}><Messages/></PrivateRoute>}/>
+          <Route path ='/notifications' element={<PrivateRoute allowedRoles={['host']}><Notification/></PrivateRoute>}/>
+          <Route path ='/payment' element={<PrivateRoute allowedRoles={['host']}><Payment/></PrivateRoute>}/>
+          <Route path ='/profile' element={<PrivateRoute allowedRoles={['host']}><Profile/></PrivateRoute>}/>
         </Route>
       </Routes>
 

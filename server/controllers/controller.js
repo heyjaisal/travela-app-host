@@ -103,7 +103,7 @@ exports.verifyOtp = async (req, res) => {
 
         res.status(200).json({
             message: 'login successful',
-            user: { name: user.name, email: user.email, country: user.country },
+            user: { name: user.name, email: user.email, role: user.role },
         });
     } catch (error) {
         console.error('error logging in', error);
