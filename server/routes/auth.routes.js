@@ -9,8 +9,10 @@ if (!process.env.JWT_SECRET || !process.env.CLIENT_URL) {
   throw new Error('Missing required environment variables: JWT_SECRET or CLIENT_URL');
 }
 
+// Google OAuth Login Route
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
+// Google OAuth Callback Route
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/auth/login/failed' }), async (req, res) => {
   if (!req.user) return res.redirect('/auth/login/failed');
 
@@ -31,24 +33,37 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
     }
 
     const token = jwt.sign({ id: host._id, role: host.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+
     res.cookie('token', token, {
-      httpOnly: true,               
-      secure: process.env.NODE_ENV === 'production', 
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
-      maxAge: 60 * 60 * 24 * 7 * 1000,         
-      path: '/',                               
+      maxAge: 60 * 60 * 24 * 7 * 1000,
+      path: '/', // Send the token as a cookie to the frontend
     });
+    res.redirect(`${process.env.CLIENT_URL}/home?token=${token}&role=${host.role}`); // Redirect back to frontend with token
     
 
-    res.redirect(`${process.env.CLIENT_URL}/home`);
   } catch (error) {
     console.error('Error during Google OAuth callback:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
 
+// Login Failed Route
 router.get('/auth/login/failed', (req, res) => {
   res.status(401).json({ message: 'Login failed' });
+});
+
+// Logout Route
+router.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send('Failed to log out.');
+    }
+    res.clearCookie('token'); 
+    res.redirect(`${process.env.CLIENT_URL}/`); // Redirect after logout
+  });
 });
 
 module.exports = router;

@@ -24,6 +24,7 @@ passport.use(
             email: profile.emails?.[0]?.value || 'no-email@google.com',
             googleId: profile.id,
             profileImage: profile.photos[0]?.value || '/no-profile-picture.jpg',
+            googleToken: token, // Store the token if needed for later use
           });
           await newHost.save();
           return done(null, newHost);
@@ -43,8 +44,12 @@ passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await Host.findById(id);
+    if (!user) {
+      return done(new Error('User not found'), null);
+    }
     done(null, user);
   } catch (error) {
+    console.error('Error deserializing user:', error);
     done(error, null);
   }
 });

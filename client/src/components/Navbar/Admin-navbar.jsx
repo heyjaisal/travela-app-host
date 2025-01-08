@@ -7,6 +7,8 @@ import {
   FaUsers,
   FaBell,
   FaPlus,
+  FaDollarSign ,
+  FaMapMarkerAlt,
   FaUser,
   FaEnvelope,
   FaRegCalendarAlt,
@@ -41,7 +43,7 @@ const UserNavbar = () => {
               `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
             }
           >
-            <FaUsers />
+            <FaMapMarkerAlt />
             Hosted
           </NavLink>
           <NavLink
@@ -50,7 +52,7 @@ const UserNavbar = () => {
               `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
             }
           >
-            <FaHome />
+            <FaDollarSign  />
             Payment
           </NavLink>
           <NavLink
@@ -68,7 +70,7 @@ const UserNavbar = () => {
               `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
             }
           >
-            <FaEnvelope />
+            <FaBell />
             Notification
           </NavLink>
           <NavLink
@@ -77,7 +79,7 @@ const UserNavbar = () => {
               `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
             }
           >
-            <FaBell />
+            <FaEnvelope />
             Messages
           </NavLink>
           <NavLink
@@ -159,7 +161,7 @@ const UserNavbar = () => {
                   `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
                 }
               >
-                <FaUsers />
+                <FaMapMarkerAlt />
                 Hosted
               </NavLink>
               <NavLink
@@ -179,7 +181,7 @@ const UserNavbar = () => {
                   `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
                 }
               >
-                <FaHome />
+                <FaRegCalendarAlt />
                 Create
               </NavLink>
               <NavLink
@@ -189,7 +191,7 @@ const UserNavbar = () => {
                   `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
                 }
               >
-                <FaHome />
+                <FaBell />
                 Notification
               </NavLink>
               <NavLink
@@ -199,7 +201,7 @@ const UserNavbar = () => {
                   `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
                 }
               >
-                <FaBell />
+                <FaEnvelope />
                 Messages
               </NavLink>
               <NavLink

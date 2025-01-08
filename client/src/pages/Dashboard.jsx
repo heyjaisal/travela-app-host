@@ -1,11 +1,30 @@
-import React from 'react'
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { setUserRole } from "../redux/Action";
 
-const home = () => {
+const Home = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    const role = params.get('role');
+    
+    if (token && role) {
+      localStorage.setItem('token', token); 
+      dispatch(setUserRole(role));               
+    } else {
+      navigate('/login');                   
+    }
+  }, [navigate, dispatch]);
+
   return (
     <div>
-      <h1>hey we are here</h1>
+      <h1>Hey, we are here!</h1>
     </div>
-  )
+  );
 }
 
-export default home
+export default Home;
