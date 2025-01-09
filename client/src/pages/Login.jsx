@@ -6,22 +6,32 @@ import { setUserRole } from "../redux/Action";
 
 const Login = () => {
 
+  const navigate = useNavigate();
+      const dispatch = useDispatch();
+    
+      useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        const role = params.get('role');
+        console.log(token, role, "Checking token and role");
+    
+        const storedToken = localStorage.getItem('token');
+        const storedRole = localStorage.getItem('role');
+    
+        if (token && role) {
+          localStorage.setItem('token', token);
+          dispatch(setUserRole(role));
+    
+          navigate('/home', { replace: true });
+        } else if (!storedToken) {
+          navigate('/login'); 
+        }
+      }, [navigate, dispatch]);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const navigate = useNavigate();
-
-  const dispatch = useDispatch();
-
-  const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    if (token) {
-      navigate("/home");
-      return;
-    }
-  }, [navigate, token]);
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

@@ -172,7 +172,7 @@ const Events = () => {
                     features: features,
                 },
                 {
-                    withCredentials: true,  // Ensure cookies are sent with the request
+                    withCredentials: true,
                 }
             );
 
@@ -189,6 +189,7 @@ const Events = () => {
                 location: { lat: 51.505, lng: -0.09 },
                 address: "",
                 isFreeTicket: false,
+                mapType:'satellite'
             });
             setfeatures([]);
         } catch (error) {

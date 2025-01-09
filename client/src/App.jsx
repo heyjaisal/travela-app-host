@@ -13,25 +13,31 @@ import Payment from './pages/payment';
 import Profile from './pages/profile';
 import Adminlayout from './components/Navbar/Admin-layout'
 import PrivateRoute from './components/utils/Privatroute';
+import { useSelector } from "react-redux";
+import PublicRoute from './components/utils/publicRoute';
 
 const App = () => {
+
+
+  const role = useSelector((state) => state.auth.role);
+
   return (
     <>
     <Router>
       <Routes>
-        <Route path ='/' element={<Landing/>}/>
-        <Route path ='/login' element={<Login/>}/>
-        <Route path ='/signup' element={<Signup/>}/>
+        <Route path ='/' element={<PublicRoute><Landing/></PublicRoute>}/>
+        <Route path ='/login' element={<PublicRoute><Login/></PublicRoute>}/>
+        <Route path ='/signup' element={<PublicRoute><Signup/></PublicRoute>}/>
 
         <Route element={<Adminlayout/>}>
-          <Route path ='/home' element={<PrivateRoute allowedRoles={['host']}><Home /></PrivateRoute>}/>
-          <Route path ='/create' element={<PrivateRoute allowedRoles={['host']}><Create/></PrivateRoute>}/>
-          <Route path ='/hosted' element={<PrivateRoute allowedRoles={['host']}> <Hosted/> </PrivateRoute>}/>
-          <Route path ='/booking' element={<PrivateRoute allowedRoles={['host']}><Booking/></PrivateRoute>}/>
-          <Route path ='/messages' element={<PrivateRoute allowedRoles={['host']}><Messages/></PrivateRoute>}/>
-          <Route path ='/notifications' element={<PrivateRoute allowedRoles={['host']}><Notification/></PrivateRoute>}/>
-          <Route path ='/payment' element={<PrivateRoute allowedRoles={['host']}><Payment/></PrivateRoute>}/>
-          <Route path ='/profile' element={<PrivateRoute allowedRoles={['host']}><Profile/></PrivateRoute>}/>
+          <Route path ='/home' element={<PrivateRoute allowedRoles={role}><Home /></PrivateRoute>}/>
+          <Route path ='/create' element={<PrivateRoute allowedRoles={role}><Create/></PrivateRoute>}/>
+          <Route path ='/hosted' element={<PrivateRoute allowedRoles={role}> <Hosted/> </PrivateRoute>}/>
+          <Route path ='/booking' element={<PrivateRoute allowedRoles={role}><Booking/></PrivateRoute>}/>
+          <Route path ='/messages' element={<PrivateRoute allowedRoles={role}><Messages/></PrivateRoute>}/>
+          <Route path ='/notifications' element={<PrivateRoute allowedRoles={role}><Notification/></PrivateRoute>}/>
+          <Route path ='/payment' element={<PrivateRoute allowedRoles={role}><Payment/></PrivateRoute>}/>
+          <Route path ='/profile' element={<PrivateRoute allowedRoles={role}><Profile/></PrivateRoute>}/>
         </Route>
       </Routes>
 

@@ -1,26 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useDispatch } from "react-redux";
-import { useNavigate } from 'react-router-dom';
-import { setUserRole } from "../redux/Action";
 
 const Signup = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   // Capture the token and role from the URL query string after Google OAuth
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    const role = params.get('role');
-    
-    if (token && role) {
-      localStorage.setItem('token', token); // Store the token in localStorage
-      dispatch(setUserRole(role));           // Dispatch the role to Redux
-      navigate('/home');                     // Navigate to the home page
-    }
-  }, [navigate, dispatch]);
-
   const [formData, setFormData] = useState({
     name: '',
     email: '',
