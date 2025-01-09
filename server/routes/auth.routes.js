@@ -41,7 +41,7 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
       maxAge: 60 * 60 * 24 * 7 * 1000,
       path: '/', 
     });
-    res.redirect(`${process.env.CLIENT_URL}/home?token=${token}&role=${host.role}`); 
+    res.redirect(`${process.env.CLIENT_URL}/login?token=${token}&role=${host.role}`); 
     
 
   } catch (error) {

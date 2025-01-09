@@ -1,20 +1,19 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
-  FaBars,
-  FaTimes,
   FaHome,
-  FaUsers,
-  FaBell,
-  FaPlus,
-  FaDollarSign ,
   FaMapMarkerAlt,
-  FaUser,
-  FaEnvelope,
+  FaDollarSign,
   FaRegCalendarAlt,
+  FaBell,
+  FaEnvelope,
+  FaPlus,
+  FaUser,
+  FaBars
 } from "react-icons/fa";
 
 const UserNavbar = () => {
+  const [isHovered, setIsHovered] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -23,86 +22,108 @@ const UserNavbar = () => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex flex-col w-64 text-slate-800 h-full">
+      <div
+        className={`hidden md:flex flex-col ${
+          isHovered ? "w-64" : "w-16"
+        } text-slate-800 h-full transition-all duration-300`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         <div className="flex items-center justify-center h-20 border-b">
-          <h1 className="text-2xl font-bold">Host Dashboard</h1>
+          
+          {isHovered && <h1 className="text-2xl font-bold">Host Dashboard</h1>}
         </div>
-        <nav className="flex-1 p-4 space-y-4">
+        <nav className="flex-1 m-3 space-y-4">
           <NavLink
             to="/home"
             className={({ isActive }) =>
-              `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+              `flex items-center gap-4 p-3 rounded-xl ${
+                isActive ? "bg-blue-600 text-white" : ""
+              }`
             }
           >
-            <FaHome />
-            Home
+            <FaHome  className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            {isHovered && <span>Home</span>}
           </NavLink>
           <NavLink
             to="/hosted"
             className={({ isActive }) =>
-              `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+              `flex items-center gap-4 p-3 rounded-xl ${
+                isActive ? "bg-blue-600 text-white" : ""
+              }`
             }
           >
-            <FaMapMarkerAlt />
-            Hosted
+            <FaMapMarkerAlt  className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            {isHovered && <span>Hosted</span>}
           </NavLink>
           <NavLink
             to="/payment"
             className={({ isActive }) =>
-              `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+              `flex items-center gap-4 p-3 rounded-xl ${
+                isActive ? "bg-blue-600 text-white" : ""
+              }`
             }
           >
-            <FaDollarSign  />
-            Payment
+            <FaDollarSign  className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            {isHovered && <span>Payment</span>}
           </NavLink>
           <NavLink
             to="/create"
             className={({ isActive }) =>
-              `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+              `flex items-center gap-4 p-3 rounded-xl ${
+                isActive ? "bg-blue-600 text-white" : ""
+              }`
             }
           >
-            <FaRegCalendarAlt />
-            Create
+            <FaRegCalendarAlt  className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            {isHovered && <span>Create</span>}
           </NavLink>
           <NavLink
             to="/notifications"
             className={({ isActive }) =>
-              `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+              `flex items-center gap-4 p-3 rounded-xl ${
+                isActive ? "bg-blue-600 text-white" : ""
+              }`
             }
           >
-            <FaBell />
-            Notification
+            <FaBell  className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            {isHovered && <span>Notification</span>}
           </NavLink>
           <NavLink
             to="/messages"
             className={({ isActive }) =>
-              `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+              `flex items-center gap-4 p-3 rounded-xl ${
+                isActive ? "bg-blue-600 text-white" : ""
+              }`
             }
           >
-            <FaEnvelope />
-            Messages
+            <FaEnvelope  className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            {isHovered && <span>Messages</span>}
           </NavLink>
           <NavLink
             to="/booking"
             className={({ isActive }) =>
-              `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+              `flex items-center gap-4 p-3 rounded-xl ${
+                isActive ? "bg-blue-600 text-white" : ""
+              }`
             }
           >
-            <FaPlus />
-            Booking
+            <FaPlus  className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            {isHovered && <span>Booking</span>}
           </NavLink>
           <NavLink
             to="/profile"
             className={({ isActive }) =>
-              `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+              `flex items-center gap-4 p-3 rounded-xl ${
+                isActive ? "bg-blue-600 text-white" : ""
+              }`
             }
           >
-            <FaUser />
-            Profile
+            <FaUser className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            {isHovered && <span>Profile</span>}
           </NavLink>
         </nav>
       </div>
-
       {/* Mobile Navbar */}
       <div className="fixed bottom-0 left-0 right-0 md:hidden bg-white shadow-lg border-t z-50">
         <nav className="flex justify-around p-2 text-slate-800">

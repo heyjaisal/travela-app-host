@@ -100,11 +100,7 @@ exports.verifyOtp = async (req, res) => {
             path: '/',
   
         });
-
-        res.status(200).json({
-            message: 'login successful',
-            user: { name: user.name, email: user.email, role: user.role },
-        });
+        res.redirect(`${process.env.CLIENT_URL}/login?token=${token}&role=${user.role}`); 
     } catch (error) {
         console.error('error logging in', error);
         res.status(400).json({ error: 'error logging in' });

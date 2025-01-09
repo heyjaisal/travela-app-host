@@ -10,7 +10,7 @@ import Messages from './pages/messages';
 import Notification from './pages/notification';
 import Signup from './pages/Signup';
 import Payment from './pages/payment';  
-import Profile from './pages/profile';
+import Profile from './pages/Account';
 import Adminlayout from './components/Navbar/Admin-layout'
 import PrivateRoute from './components/utils/Privatroute';
 import { useSelector } from "react-redux";

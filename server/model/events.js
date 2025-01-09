@@ -74,6 +74,9 @@ const eventSchema = new mongoose.Schema({
     min: 0,
     max: 100,
   },
+  image:{
+    type: String,
+  },
   host: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Host',  

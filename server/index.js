@@ -11,34 +11,32 @@ require('dotenv').config();
 const app = express();
 app.use(cookieParser());
 
-// MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log('MongoDB connection error:', err));
 
 app.use(express.json());
 
-// Passport Configuration
 require('./config/passport');
 
-// CORS Configuration - Allow frontend origin
 app.use(cors({
-  origin: 'http://localhost:5173',  // Allow only your frontend URL
-  credentials: true,  // Allow cookies to be sent with requests
+  origin: 'http://localhost:5173', 
+  credentials: true, 
 }));
 
-// Session Handling
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production' }, // Adjust for production
+  cookie: { secure: process.env.NODE_ENV === 'production' },
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Routes
+app.use(express.static('public'));
+
 app.use('/api', authRoutes); 
 app.use(authRoute);
 
