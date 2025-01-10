@@ -1,5 +1,5 @@
-import React, { useState,useEffect } from "react";
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { NavLink } from "react-router-dom";
 import {
   FaHome,
@@ -8,14 +8,14 @@ import {
   FaRegCalendarAlt,
   FaBell,
   FaEnvelope,
+  FaCog ,
   FaPlus,
   FaUser,
   FaBars,
-  FaTimes
+  FaTimes,
 } from "react-icons/fa";
 
 const UserNavbar = () => {
-
   const [user, setUser] = useState({ name: "", profileImage: "" });
   const [isHovered, setIsHovered] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -26,12 +26,13 @@ const UserNavbar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/profile', { withCredentials: true });
+        const response = await axios.get("http://localhost:5000/api/profile", {
+          withCredentials: true,
+        });
         setUser(response.data);
         console.log(response.data);
-        
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error("Error fetching user data:", error);
       }
     };
     fetchData();
@@ -42,22 +43,24 @@ const UserNavbar = () => {
       {/* Desktop Sidebar */}
       <div
         className={`hidden md:flex flex-col ${
-          isHovered ? "w-64" : "w-16"
+          isHovered ? "w-64" : "w-18"
         } text-slate-800 h-full transition-all duration-300`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-          
-          <div className="flex items-center gap-4 p-2 pl-3 border-b">
-  <img
-    src={user.profileImage || "/client/public/no-profile.jpg"}
-    alt="User"
-    className="w-10 h-10 rounded-full object-cover"
-  />
-  {isHovered && <h1 className="text-xl font-bold">{user.name}</h1>}
-</div>
-
+        <NavLink
         
+        to="/account">
+        <div className="flex items-center gap-4 p-3 pt-6 pb-6 pl-4 border-b">
+          <img
+            src={user.profileImage || "/client/public/no-profile.jpg"}
+            alt="User"
+            className="w-9 h-9 rounded-full object-cover"
+          />
+          {isHovered && <h1 className="text-xl font-bold">{user.name}</h1>}
+        </div>
+        </NavLink>
+
         <nav className="flex-1 m-3 space-y-4">
           <NavLink
             to="/home"
@@ -67,7 +70,7 @@ const UserNavbar = () => {
               }`
             }
           >
-            <FaHome  className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            <FaHome className={`${isHovered ? "text-xl" : "text-2xl"}`} />
             {isHovered && <span>Home</span>}
           </NavLink>
           <NavLink
@@ -78,7 +81,9 @@ const UserNavbar = () => {
               }`
             }
           >
-            <FaMapMarkerAlt  className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            <FaMapMarkerAlt
+              className={`${isHovered ? "text-xl" : "text-2xl"}`}
+            />
             {isHovered && <span>Hosted</span>}
           </NavLink>
           <NavLink
@@ -89,7 +94,8 @@ const UserNavbar = () => {
               }`
             }
           >
-            <FaDollarSign  className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            <FaDollarSign className={`${isHovered ? "text-[1.375rem]" : "text-xl"}`} />
+
             {isHovered && <span>Payment</span>}
           </NavLink>
           <NavLink
@@ -100,7 +106,9 @@ const UserNavbar = () => {
               }`
             }
           >
-            <FaRegCalendarAlt  className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            <FaRegCalendarAlt
+              className={`${isHovered ? "text-[1.375rem]" : "text-xl"}`}
+            />
             {isHovered && <span>Create</span>}
           </NavLink>
           <NavLink
@@ -111,7 +119,7 @@ const UserNavbar = () => {
               }`
             }
           >
-            <FaBell  className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            <FaBell className={`${isHovered ? "text-[1.375rem]" : "text-xl"}`} />
             {isHovered && <span>Notification</span>}
           </NavLink>
           <NavLink
@@ -122,7 +130,7 @@ const UserNavbar = () => {
               }`
             }
           >
-            <FaEnvelope  className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            <FaEnvelope className={`${isHovered ? "text-[1.375rem]" : "text-xl"}`} />
             {isHovered && <span>Messages</span>}
           </NavLink>
           <NavLink
@@ -133,7 +141,7 @@ const UserNavbar = () => {
               }`
             }
           >
-            <FaPlus  className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            <FaPlus className={`${isHovered ? "text-[1.375rem]" : "text-xl"}`} />
             {isHovered && <span>Booking</span>}
           </NavLink>
           <NavLink
@@ -144,7 +152,7 @@ const UserNavbar = () => {
               }`
             }
           >
-            <FaUser className={`${isHovered ? "text-xl" : "text-1xl"}`} />
+            <FaCog  className={`${isHovered ? "text-[1.375rem]" : "text-xl"}`} />
             {isHovered && <span>Profile</span>}
           </NavLink>
         </nav>
@@ -152,7 +160,10 @@ const UserNavbar = () => {
       {/* Mobile Navbar */}
       <div className="fixed bottom-0 left-0 right-0 md:hidden bg-white shadow-lg border-t z-50">
         <nav className="flex justify-around p-2 text-slate-800">
-          <button onClick={toggleSidebar} className="flex flex-col items-center gap-1">
+          <button
+            onClick={toggleSidebar}
+            className="flex flex-col items-center gap-1"
+          >
             {isSidebarOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
             <span className="text-xs">Menu</span>
           </button>
@@ -160,7 +171,9 @@ const UserNavbar = () => {
           <NavLink
             to="/messages"
             className={({ isActive }) =>
-              `flex flex-col items-center gap-1 ${isActive ? "text-blue-500" : ""}`
+              `flex flex-col items-center gap-1 ${
+                isActive ? "text-blue-500" : ""
+              }`
             }
           >
             <FaEnvelope size={20} />
@@ -169,7 +182,9 @@ const UserNavbar = () => {
           <NavLink
             to="/profile"
             className={({ isActive }) =>
-              `flex flex-col items-center gap-1 ${isActive ? "text-blue-500" : ""}`
+              `flex flex-col items-center gap-1 ${
+                isActive ? "text-blue-500" : ""
+              }`
             }
           >
             {/* User Profile Image */}
@@ -201,7 +216,9 @@ const UserNavbar = () => {
                 to="/home"
                 onClick={closeSidebar}
                 className={({ isActive }) =>
-                  `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+                  `flex items-center gap-4 p-3 rounded-xl ${
+                    isActive ? "bg-blue-600 text-white" : ""
+                  }`
                 }
               >
                 <FaHome />
@@ -211,7 +228,9 @@ const UserNavbar = () => {
                 to="/hosted"
                 onClick={closeSidebar}
                 className={({ isActive }) =>
-                  `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+                  `flex items-center gap-4 p-3 rounded-xl ${
+                    isActive ? "bg-blue-600 text-white" : ""
+                  }`
                 }
               >
                 <FaMapMarkerAlt />
@@ -221,7 +240,9 @@ const UserNavbar = () => {
                 to="/payments"
                 onClick={closeSidebar}
                 className={({ isActive }) =>
-                  `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+                  `flex items-center gap-4 p-3 rounded-xl ${
+                    isActive ? "bg-blue-600 text-white" : ""
+                  }`
                 }
               >
                 <FaEnvelope />
@@ -231,7 +252,9 @@ const UserNavbar = () => {
                 to="/create"
                 onClick={closeSidebar}
                 className={({ isActive }) =>
-                  `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+                  `flex items-center gap-4 p-3 rounded-xl ${
+                    isActive ? "bg-blue-600 text-white" : ""
+                  }`
                 }
               >
                 <FaRegCalendarAlt />
@@ -241,7 +264,9 @@ const UserNavbar = () => {
                 to="/notifications"
                 onClick={closeSidebar}
                 className={({ isActive }) =>
-                  `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+                  `flex items-center gap-4 p-3 rounded-xl ${
+                    isActive ? "bg-blue-600 text-white" : ""
+                  }`
                 }
               >
                 <FaBell />
@@ -251,7 +276,9 @@ const UserNavbar = () => {
                 to="/messages"
                 onClick={closeSidebar}
                 className={({ isActive }) =>
-                  `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+                  `flex items-center gap-4 p-3 rounded-xl ${
+                    isActive ? "bg-blue-600 text-white" : ""
+                  }`
                 }
               >
                 <FaEnvelope />
@@ -261,7 +288,9 @@ const UserNavbar = () => {
                 to="/booking"
                 onClick={closeSidebar}
                 className={({ isActive }) =>
-                  `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+                  `flex items-center gap-4 p-3 rounded-xl ${
+                    isActive ? "bg-blue-600 text-white" : ""
+                  }`
                 }
               >
                 <FaPlus />
@@ -271,10 +300,12 @@ const UserNavbar = () => {
                 to="/profile"
                 onClick={closeSidebar}
                 className={({ isActive }) =>
-                  `flex items-center gap-4 p-3 rounded-xl ${isActive ? "bg-blue-600 text-white" : ""}`
+                  `flex items-center gap-4 p-3 rounded-xl ${
+                    isActive ? "bg-blue-600 text-white" : ""
+                  }`
                 }
               >
-                <FaUser />
+                <FaCog  />
                 Profile
               </NavLink>
             </nav>
