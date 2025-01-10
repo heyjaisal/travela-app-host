@@ -7,6 +7,9 @@ export default {
     ],
     theme: {
       extend: {
+        fontFamily: {
+          ios: ['"SF Pro Text"', '"SF Pro Display"', '-apple-system', 'BlinkMacSystemFont', 'Helvetica', 'Arial', 'sans-serif'],
+        },
         colors: {
           background:'#F4F7FE',
           hover:'#8A33FD',

@@ -1,41 +1,140 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { LOGOUT } from '../redux/Action';
 
-const profile = () => {
+const Profile = () => {
+  const dispatch = useDispatch();
+  const [fields, setFields] = useState({
+    name: '',
+    country: '',
+    city: '',
+    gender: '',
+    interest: '',
+  });
 
-    const dispatch = useDispatch();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/profile', { withCredentials: true });
+        setFields(response.data);
+        console.log(response.data);
+        
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
-    const handleLogout = () => {
-        // Check if gapi is loaded
-        if (window.gapi && window.gapi.auth2) {
-          const auth2 = window.gapi.auth2.getAuthInstance();
-          if (auth2.isSignedIn.get()) {
-            auth2.signOut().catch(console.error);
-          }
-        }
-      
-        dispatch({ type: LOGOUT });
-        localStorage.clear();
-        sessionStorage.clear();
-        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
-      };
+  const handleFieldChange = (e) => {
+    const { name, value } = e.target;
+    setFields((prev) => ({ ...prev, [name]: value }));
+  };
 
-      
+  const handleSave = async () => {
+    try {
+      await axios.put('http://localhost:5000/api/profile', fields, { withCredentials: true });
+      alert('Profile updated successfully!');
+    } catch (error) {
+      console.error('Error saving profile data:', error);
+    }
+  };
+
+  const handleLogout = () => {
+    if (window.gapi && window.gapi.auth2) {
+      const auth2 = window.gapi.auth2.getAuthInstance();
+      if (auth2.isSignedIn.get()) {
+        auth2.signOut().catch(console.error);
+      }
+    }
+
+    dispatch({ type: LOGOUT });
+    localStorage.clear();
+    sessionStorage.clear();
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+  };
+
   return (
-    <div class="grid grid-cols-1 lg:grid-cols-2 lg:gap-4">
-
-    <div class="order-2 lg:order-1">
     <div>
-         <button className='px-3 bg-red-600' onClick={handleLogout}>Logout</button>
-      
-    </div>
-    </div>
-  
-    <div class="order-1 lg:order-2">7</div>
-  </div>
+      <h2 className="text-lg font-mono mb-4">User Information</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 lg:gap-4">
+        <div className="order-2 md:order-1 lg:order-1">
+          <h1>The Left Side</h1>
+          <form>
+            <div>
+              <label>Name:</label>
+              <input
+                type="text"
+                name="name"
+                value={fields.name}
+                onChange={handleFieldChange}
+                className="border p-2 rounded w-full"
+              />
+            </div>
+            <div>
+              <label>Country:</label>
+              <input
+                type="text"
+                name="country"
+                value={fields.country}
+                onChange={handleFieldChange}
+                className="border p-2 rounded w-full"
+              />
+            </div>
+            <div>
+              <label>City:</label>
+              <input
+                type="text"
+                name="city"
+                value={fields.city}
+                onChange={handleFieldChange}
+                className="border p-2 rounded w-full"
+              />
+            </div>
+            <div>
+              <label>Gender:</label>
+              <select
+                name="gender"
+                value={fields.gender}
+                onChange={handleFieldChange}
+                className="border p-2 rounded w-full"
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+            <div>
+              <label>Interest:</label>
+              <input
+                type="text"
+                name="interest"
+                value={fields.interest}
+                onChange={handleFieldChange}
+                className="border p-2 rounded w-full"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleSave}
+              className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+            >
+              Save
+            </button>
+          </form>
+        </div>
 
-  )
-}
+        <div className="order-1 md:order-2 lg:order-2">
+          <div>
+            <button className="px-3 bg-red-600 text-white" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-export default profile
+export default Profile;

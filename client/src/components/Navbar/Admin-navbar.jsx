@@ -9,7 +9,8 @@ import {
   FaEnvelope,
   FaPlus,
   FaUser,
-  FaBars
+  FaBars,
+  FaTimes
 } from "react-icons/fa";
 
 const UserNavbar = () => {

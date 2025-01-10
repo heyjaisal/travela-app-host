@@ -152,3 +152,38 @@ exports.eventproperty = async (req, res) => {
     res.status(500).json({ error: 'Failed to save event' });
   }
 };
+
+exports.updateprofile = async (req, res) => {
+  try {
+    const userId = req.user.id; 
+    const updatedData = req.body;
+
+    const updatedUser = await Host.findByIdAndUpdate(userId, updatedData, {
+      new: true,
+      runValidators: true, 
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'Profile updated successfully', data: updatedUser });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating profile', error });
+  }
+};
+
+exports.getHost =  async (req, res) => {
+  try {
+    const userId = req.user.id; 
+    const user = await Host.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching profile', error });
+  }
+};

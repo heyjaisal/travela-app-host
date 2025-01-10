@@ -12,7 +12,11 @@ const hostSchema = new mongoose.Schema({
   profileImage: { type: String, default: '/no-profile-picture.jpg' },
   instname: { type: String },
   course: { type: String },
-  city: { type: String }
+  city: { type: String },
+  interest: { type: [String] },
+  gender: { type: String, enum: ['male', 'female'] }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Host', hostSchema);
+const Host = mongoose.model('Host', hostSchema);
+
+module.exports = Host;
