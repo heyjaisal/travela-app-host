@@ -3,7 +3,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { LOGOUT } from "../redux/Action";
 import { ToastContainer, toast } from "react-toastify";
-import { ClipLoader } from "react-spinners"; // Import ClipLoader
+import { ClipLoader } from "react-spinners";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
@@ -27,7 +27,7 @@ const ProfilePage = () => {
           withCredentials: true,
         });
         setProfile(response.data);
-        setLoading(false); // Data loaded
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching user data:", error);
         setLoading(false); 
