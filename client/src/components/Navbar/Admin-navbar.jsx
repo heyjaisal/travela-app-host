@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
+import axios from 'axios';
 import { NavLink } from "react-router-dom";
 import {
   FaHome,
@@ -14,11 +15,27 @@ import {
 } from "react-icons/fa";
 
 const UserNavbar = () => {
+
+  const [user, setUser] = useState({ name: "", profileImage: "" });
   const [isHovered, setIsHovered] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/profile', { withCredentials: true });
+        setUser(response.data);
+        console.log(response.data);
+        
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -30,10 +47,17 @@ const UserNavbar = () => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="flex items-center justify-center h-20 border-b">
           
-          {isHovered && <h1 className="text-2xl font-bold">Host Dashboard</h1>}
-        </div>
+          <div className="flex items-center gap-4 p-2 pl-3 border-b">
+  <img
+    src={user.profileImage || "/client/public/no-profile.jpg"}
+    alt="User"
+    className="w-10 h-10 rounded-full object-cover"
+  />
+  {isHovered && <h1 className="text-xl font-bold">{user.name}</h1>}
+</div>
+
+        
         <nav className="flex-1 m-3 space-y-4">
           <NavLink
             to="/home"
@@ -58,7 +82,7 @@ const UserNavbar = () => {
             {isHovered && <span>Hosted</span>}
           </NavLink>
           <NavLink
-            to="/payment"
+            to="/payments"
             className={({ isActive }) =>
               `flex items-center gap-4 p-3 rounded-xl ${
                 isActive ? "bg-blue-600 text-white" : ""
@@ -148,8 +172,15 @@ const UserNavbar = () => {
               `flex flex-col items-center gap-1 ${isActive ? "text-blue-500" : ""}`
             }
           >
-            <FaUser size={20} />
-            <span className="text-xs">Profile</span>
+            {/* User Profile Image */}
+            <div className="flex flex-col items-center gap-1">
+              <img
+                src={user.profileImage || "/client/public/no-profile.jpg"}
+                alt="User"
+                className="w-8 h-8 rounded-full border border-slate-300"
+              />
+              <span className="text-xs">Me</span>
+            </div>
           </NavLink>
         </nav>
       </div>

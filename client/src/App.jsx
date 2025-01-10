@@ -11,6 +11,7 @@ import Notification from './pages/notification';
 import Signup from './pages/Signup';
 import Payment from './pages/payment';  
 import Profile from './pages/Account';
+import Account from './pages/Profile'
 import Adminlayout from './components/Navbar/Admin-layout'
 import PrivateRoute from './components/utils/Privatroute';
 import { useSelector } from "react-redux";
@@ -36,8 +37,9 @@ const App = () => {
           <Route path ='/booking' element={<PrivateRoute allowedRoles={role}><Booking/></PrivateRoute>}/>
           <Route path ='/messages' element={<PrivateRoute allowedRoles={role}><Messages/></PrivateRoute>}/>
           <Route path ='/notifications' element={<PrivateRoute allowedRoles={role}><Notification/></PrivateRoute>}/>
-          <Route path ='/payment' element={<PrivateRoute allowedRoles={role}><Payment/></PrivateRoute>}/>
+          <Route path ='/payments' element={<PrivateRoute allowedRoles={role}><Payment/></PrivateRoute>}/>
           <Route path ='/profile' element={<PrivateRoute allowedRoles={role}><Profile/></PrivateRoute>}/>
+          <Route path ='/account' element={<PrivateRoute allowedRoles={role}><Account/></PrivateRoute>}/>
         </Route>
       </Routes>
 

@@ -11,9 +11,8 @@ const hostSchema = new mongoose.Schema({
   street: { type: String },
   profileImage: { type: String, default: '/no-profile-picture.jpg' },
   instname: { type: String },
-  course: { type: String },
   city: { type: String },
-  interest: { type: [String] },
+  phone:{type:Number},
   gender: { type: String, enum: ['male', 'female'] }
 }, { timestamps: true });
 

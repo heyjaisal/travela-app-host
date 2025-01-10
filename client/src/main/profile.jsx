@@ -8,9 +8,10 @@ const Profile = () => {
   const [fields, setFields] = useState({
     name: '',
     country: '',
+    email:'',
+    phone:'',
     city: '',
     gender: '',
-    interest: '',
   });
 
   useEffect(() => {
@@ -57,64 +58,65 @@ const Profile = () => {
 
   return (
     <div>
-      <h2 className="text-lg font-mono mb-4">User Information</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 lg:gap-4">
+      <h2 className="text-lg font-mono ml-6 mb-4">User Information</h2>
+      <div className="grid grid-cols-1  lg:ml-8 md:grid-cols-2 lg:grid-cols-2 lg:gap-4">
         <div className="order-2 md:order-1 lg:order-1">
-          <h1>The Left Side</h1>
           <form>
-            <div>
-              <label>Name:</label>
+            <div className='mb-4'>
+              <label className="block text-sm font-semibold text-gray-700" >Name:</label>
               <input
                 type="text"
                 name="name"
                 value={fields.name}
                 onChange={handleFieldChange}
-                className="border p-2 rounded w-full"
+                className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
               />
             </div>
-            <div>
-              <label>Country:</label>
+            <div className='mb-4'> 
+              <label className="block text-sm font-semibold text-gray-700">Country:</label>
               <input
                 type="text"
                 name="country"
                 value={fields.country}
                 onChange={handleFieldChange}
-                className="border p-2 rounded w-full"
+                className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
+
               />
             </div>
-            <div>
-              <label>City:</label>
+            <div className='mb-4'>
+              <label className="block text-sm font-semibold text-gray-700">City:</label>
               <input
                 type="text"
                 name="city"
                 value={fields.city}
                 onChange={handleFieldChange}
-                className="border p-2 rounded w-full"
+                className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
+
               />
             </div>
-            <div>
-              <label>Gender:</label>
-              <select
-                name="gender"
-                value={fields.gender}
+            <div className='mb-4'>
+              <label className="block text-sm font-semibold text-gray-700">Phone:</label>
+              <input
+                type="number"
+                name="phone"
+                value={fields.phone}
                 onChange={handleFieldChange}
-                className="border p-2 rounded w-full"
-              >
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
+                className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
+
+              />
             </div>
-            <div>
-              <label>Interest:</label>
+            <div className='mb-4'>
+              <label className="block text-sm font-semibold text-gray-700">Email:</label>
               <input
                 type="text"
-                name="interest"
-                value={fields.interest}
-                onChange={handleFieldChange}
-                className="border p-2 rounded w-full"
+                name="email"
+                value={fields.email}
+               disabled
+                className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
+
               />
             </div>
+            
             <button
               type="button"
               onClick={handleSave}
@@ -126,6 +128,20 @@ const Profile = () => {
         </div>
 
         <div className="order-1 md:order-2 lg:order-2">
+        <div className='mb-4'>
+              <label className="block text-sm font-semibold text-gray-700">Gender:</label>
+              <select
+                name="gender"
+                value={fields.gender}
+                onChange={handleFieldChange}
+                className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
+
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
           <div>
             <button className="px-3 bg-red-600 text-white" onClick={handleLogout}>
               Logout
