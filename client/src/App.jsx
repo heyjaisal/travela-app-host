@@ -15,7 +15,6 @@ import Account from './pages/Profile'
 import Adminlayout from './components/Navbar/Admin-layout'
 import PrivateRoute from './components/utils/Privatroute';
 import { useSelector } from "react-redux";
-import PublicRoute from './components/utils/publicRoute';
 
 const App = () => {
 
@@ -26,9 +25,9 @@ const App = () => {
     <>
     <Router>
       <Routes>
-        <Route path ='/' element={<PublicRoute><Landing/></PublicRoute>}/>
-        <Route path ='/login' element={<PublicRoute><Login/></PublicRoute>}/>
-        <Route path ='/signup' element={<PublicRoute><Signup/></PublicRoute>}/>
+        <Route path ='/' element={<Landing/>}/>
+        <Route path ='/login' element={<Login/>}/>
+        <Route path ='/signup' element={<Signup/>}/>
 
         <Route element={<Adminlayout/>}>
           <Route path ='/home' element={<PrivateRoute allowedRoles={role}><Home /></PrivateRoute>}/>

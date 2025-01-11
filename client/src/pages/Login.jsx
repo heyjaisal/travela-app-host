@@ -5,33 +5,31 @@ import { useDispatch } from "react-redux";
 import { setUserRole } from "../redux/Action";
 
 const Login = () => {
-
   const navigate = useNavigate();
-      const dispatch = useDispatch();
-    
-      useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const token = params.get('token');
-        const role = params.get('role');
-        console.log(token, role, "Checking token and role");
-    
-        const storedToken = localStorage.getItem('token');
-        const storedRole = localStorage.getItem('role');
-    
-        if (token && role) {
-          localStorage.setItem('token', token);
-          dispatch(setUserRole(role));
-    
-          navigate('/home', { replace: true });
-        } else if (!storedToken) {
-          navigate('/login'); 
-        }
-      }, [navigate, dispatch]);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
+    const params = new URLSearchParams(window.location.search);
+    const queryToken = params.get("token");
+    const queryRole = params.get("role");
+
+    if (queryToken && queryRole) {
+      localStorage.setItem("token", queryToken);
+      dispatch(setUserRole(queryRole));
+      navigate("/home", { replace: true });
+    } else if (token) {
+      navigate("/home");
+    } else {
+      navigate("/login");
+    }
+  }, [navigate, dispatch]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -72,7 +70,7 @@ const Login = () => {
         password,
       });
 
-      const { token,role } = response.data;
+      const { token, role } = response.data;
 
       dispatch(setUserRole(role));
 
@@ -88,7 +86,6 @@ const Login = () => {
   const handleGoogleSignup = () => {
     window.location.href = "http://localhost:5000/auth/google";
   };
-  
 
   return (
     <div className="flex h-screen w-screen">

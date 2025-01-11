@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 const Signup = () => {
 
-  // Capture the token and role from the URL query string after Google OAuth
+
+  
+
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',

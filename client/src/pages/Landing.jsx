@@ -1,6 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
+
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem('token')
+
+  useEffect(()=>{
+    if(token){
+      navigate('/home')
+    }
+
+  },[navigate])
   return (
     <nav className="w-full bg-slate-800 p-4 flex justify-end">
       <div className="flex gap-4">
