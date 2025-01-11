@@ -59,20 +59,22 @@ return Object.keys(temperror).length === 0
       } 
       
 
-  const handleSave = async () => {
-    if(validatefeilds()){
-      try {
-        await axios.put("http://localhost:5000/api/profile", Profile, {
-          withCredentials: true,
-        });
-        toast.success("Profile details submitted successfully!");
-      } catch (error) {
-        console.error("Error saving profile data:", error);
-        toast.error("Failed to submit event details.");
-      }
-    }
-   
-  };
+      const handleSave = async () => {
+        if (validatefields()) {
+          try {
+            await axios.put("http://localhost:5000/api/profile", Profile, {
+              withCredentials: true,
+            });
+            toast.success("Profile details submitted successfully!");
+          } catch (error) {
+            if (error.response?.data?.message === "Phone number already exists") {
+              setErrors((prev) => ({ ...prev, phone: error.response.data.message }));
+            } else {
+              toast.error("Failed to update profile");
+            }
+          }
+        }
+      };
 
   const handleLogout = () => {
     if (window.gapi && window.gapi.auth2) {
@@ -89,7 +91,7 @@ return Object.keys(temperror).length === 0
   };
 
   if (loading) {
-    // Render modern spinner while fetching data
+
     return (
       <div className="min-h-screen flex items-center justify-center">
         <ClipLoader size={50} color={"#4A90E2"} loading={loading} />

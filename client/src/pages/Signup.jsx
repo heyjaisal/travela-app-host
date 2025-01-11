@@ -5,8 +5,16 @@ import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
 
-
+  const navigate = useNavigate();
   
+    const token = localStorage.getItem('token')
+  
+    useEffect(()=>{
+      if(token){
+        navigate('/home')
+      }
+  
+    },[navigate])
 
   
   const [formData, setFormData] = useState({

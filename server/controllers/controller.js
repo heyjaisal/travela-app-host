@@ -110,7 +110,7 @@ exports.verifyOtp = async (req, res) => {
 exports.addProperty = async (req, res) => {
   try {
     const propertyData = req.body;
-    const userId = req.user._id; 
+    const userId = req.user.id; 
 
     const newProperty = new Property({
       ...propertyData,
@@ -155,23 +155,32 @@ exports.eventproperty = async (req, res) => {
 
 exports.updateprofile = async (req, res) => {
   try {
-    const userId = req.user.id; 
+    const userId = req.user.id;
     const updatedData = req.body;
+
+    const phoneExists = await Host.findOne({ phone: updatedData.phone });
+    if (phoneExists && phoneExists.id !== userId) {
+      return res.status(400).json({ message: "Phone number already exists" });
+    }
 
     const updatedUser = await Host.findByIdAndUpdate(userId, updatedData, {
       new: true,
-      runValidators: true, 
+      runValidators: true,
     });
 
     if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({ message: 'Profile updated successfully', data: updatedUser });
+    res.status(200).json({
+      message: "Profile updated successfully",
+      data: updatedUser,
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error updating profile', error });
+    res.status(500).json({ message: "Error updating profile", error });
   }
 };
+
 
 exports.getHost =  async (req, res) => {
   try {

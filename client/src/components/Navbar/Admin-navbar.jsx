@@ -70,7 +70,7 @@ const UserNavbar = () => {
               }`
             }
           >
-            <FaHome className={`${isHovered ? "text-xl" : "text-2xl"}`} />
+            <FaHome className={`${isHovered ? "text-[1.375rem]" : "text-xl"}`} />
             {isHovered && <span>Home</span>}
           </NavLink>
           <NavLink
@@ -82,7 +82,7 @@ const UserNavbar = () => {
             }
           >
             <FaMapMarkerAlt
-              className={`${isHovered ? "text-xl" : "text-2xl"}`}
+              className={`${isHovered ? "text-[1.375rem]" : "text-xl"}`}
             />
             {isHovered && <span>Hosted</span>}
           </NavLink>

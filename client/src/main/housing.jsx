@@ -139,7 +139,9 @@ const Housing = () => {
       try {
         const response = await axios.post(
           "http://localhost:5000/api/properties",
-          houseData
+          houseData,{
+            withCredentials: true,
+        }
         );
         console.log("Success:", response.data);
         toast.success("Property details submitted successfully!");
