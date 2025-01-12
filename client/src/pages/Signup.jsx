@@ -2,51 +2,69 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-
 const Signup = () => {
-
   const navigate = useNavigate();
   
-    const token = localStorage.getItem('token')
+  const token = localStorage.getItem('token');
   
-    useEffect(()=>{
-      if(token){
-        navigate('/home')
-      }
-  
-    },[navigate])
+  useEffect(() => {
+    if (token) {
+      navigate('/home');
+    }
+  }, [navigate]);
 
-  
   const [formData, setFormData] = useState({
-    name: '',
+    username: '',
     email: '',
     password: '',
     cpassword: '',
-    country: '',
     otp: '',
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState({});
   const [showOtpPopup, setShowOtpPopup] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
+  const validateFeilds = () => {
+    let temperror = {};
+
+    const usernameRegex = /^[a-zA-Z0-9\-]+$/;
+
+    if (!formData.username) {
+      temperror.username = "User name is required";
+    } else if (!usernameRegex.test(formData.username)) {
+      temperror.username = "Username only contains numbers, alphabets, and '-' (No spaces or special characters)";
+    }
+    if (!formData.email) {
+      temperror.email = "Email is required";
+    }
+    if (!formData.password) {
+      temperror.password = "Password is required";
+    }
+    if (!formData.cpassword) {
+      temperror.cpassword = "Confirm your password";
+    } else if (formData.password !== formData.cpassword) {
+      temperror.cpassword = "Passwords do not match";
+    }
+    if (!formData.otp) {
+      temperror.otp = "Enter your OTP";
+    }
+    setError(temperror);
+    return Object.keys(temperror).length === 0;
+  }
+
   const handleSendOtp = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.country || !formData.password || !formData.cpassword) {
-      return setError('Please fill out all fields.');
-    }
-    if (formData.password !== formData.cpassword) {
-      return setError('Passwords do not match.');
-    }
-
-    try {
-      await axios.post('http://localhost:5000/api/send-otp', { email: formData.email });
-      setShowOtpPopup(true);
-      setError('');
-    } catch (err) {
-      setError('Failed to send OTP. Please try again.');
+    if (validateFeilds()) {
+      try {
+        await axios.post('http://localhost:5000/api/send-otp', { email: formData.email });
+        setShowOtpPopup(true);
+        setError({});
+      } catch (err) {
+        setError({ general: 'Failed to send OTP. Please try again.' });
+      }
     }
   };
 
@@ -58,7 +76,7 @@ const Signup = () => {
       }
       setShowOtpPopup(false);
     } catch (error) {
-      setError('Invalid OTP.');
+      setError({ otp: 'Invalid OTP.' });
     }
   };
 
@@ -82,30 +100,21 @@ const Signup = () => {
         <form onSubmit={handleSendOtp} className="w-96 max-w-full mx-auto px-4">
           <h2 className="text-3xl font-semibold text-gray-700 text-center mb-4">Create Account</h2>
 
-          {error && <p className="text-red-500 text-sm text-center mb-3">{error}</p>}
-
+          {/* Render each specific error message under each input */}
           <div className="mb-3">
-            <label htmlFor="name" className="block text-gray-600 mb-2">Name</label>
+            <label htmlFor="username" className="block text-gray-600 mb-2">Name</label>
             <input
-              id="name"
+              id="username"
               type="text"
-              placeholder="Enter your name"
-              value={formData.name}
+              placeholder="Enter your Username"
+              value={formData.username}
               onChange={handleChange}
               className="w-full px-4 py-2 bg-gray-100 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+              autoComplete="username"
             />
-          </div>
-
-          <div className="mb-3">
-            <label htmlFor="country" className="block text-gray-600 mb-2">Country</label>
-            <input
-              id="country"
-              type="text"
-              placeholder="Enter your country"
-              value={formData.country}
-              onChange={handleChange}
-              className="w-full px-4 py-2 bg-gray-100 border rounded-lg focus:ring-2 focus:ring-indigo-400"
-            />
+            {error.username && (
+              <p className="text-red-500 text-sm mt-1">{error.username}</p>
+            )}
           </div>
 
           <div className="mb-3">
@@ -117,7 +126,11 @@ const Signup = () => {
               value={formData.email}
               onChange={handleChange}
               className="w-full px-4 py-2 bg-gray-100 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+              autoComplete="email"
             />
+            {error.email && (
+              <p className="text-red-500 text-sm mt-1">{error.email}</p>
+            )}
           </div>
 
           <div className="mb-3">
@@ -129,7 +142,11 @@ const Signup = () => {
               value={formData.password}
               onChange={handleChange}
               className="w-full px-4 py-2 bg-gray-100 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+              autoComplete="new-password"
             />
+            {error.password && (
+              <p className="text-red-500 text-sm mt-1">{error.password}</p>
+            )}
           </div>
 
           <div className="mb-3">
@@ -141,7 +158,11 @@ const Signup = () => {
               value={formData.cpassword}
               onChange={handleChange}
               className="w-full px-4 py-2 bg-gray-100 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+              autoComplete="new-password"
             />
+            {error.cpassword && (
+              <p className="text-red-500 text-sm mt-1">{error.cpassword}</p>
+            )}
           </div>
 
           <button
@@ -151,7 +172,6 @@ const Signup = () => {
             Send OTP
           </button>
 
-          {/* OR Section */}
           <div className="flex items-center justify-center my-4">
             <hr className="w-1/4 border-gray-300" />
             <span className="mx-2 text-gray-400">OR</span>
@@ -187,7 +207,11 @@ const Signup = () => {
               value={formData.otp}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg mb-3 focus:ring-2 focus:ring-indigo-400"
+              autoComplete="one-time-code"
             />
+            {error.otp && (
+              <p className="text-red-500 text-sm mt-1">{error.otp}</p>
+            )}
             <button
               onClick={handleVerifyOtp}
               className="w-full bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-600"

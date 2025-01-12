@@ -36,7 +36,7 @@ exports.sendOtp = async (req, res) => {
 
 
 exports.verifyOtp = async (req, res) => {
-    const { name, email, password, country, otp } = req.body;
+    const { username, email, password, otp } = req.body;
     console.log(req.body);
   
     try {
@@ -54,7 +54,7 @@ exports.verifyOtp = async (req, res) => {
   
       const hashedPassword = await bcrypt.hash(password, 12);
   
-      await Host.create({ name, email, password: hashedPassword, country, role: 'user', verified: true });
+      await Host.create({ username, email, password: hashedPassword, role: 'user', verified: true });
   
       await Otp.deleteOne({ email });
   

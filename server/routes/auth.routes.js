@@ -44,9 +44,10 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
-      maxAge: 60 * 60 * 24 * 7 * 1000, 
-      path: '/', 
+      maxAge: 60 * 60 * 24 * 30 * 5 * 1000, // 5 months
+      path: '/',
     });
+    
 
     res.redirect(`${process.env.CLIENT_URL}/login?token=${token}&role=${host.role}`);
   } catch (error) {
