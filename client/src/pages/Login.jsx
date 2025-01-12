@@ -121,12 +121,7 @@ const Login = () => {
           </div>
 
           <div className="mb-6">
-            <label
-              htmlFor="password"
-              className="block text-gray-600 font-medium mb-2"
-            >
-              Password
-            </label>
+          <label htmlFor="password" className="block text-gray-600 mb-2">Password</label>
             <div className="relative">
               <input
                 type="password"
