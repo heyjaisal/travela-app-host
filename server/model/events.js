@@ -65,15 +65,6 @@ const eventSchema = new mongoose.Schema({
       trim: true,
     },
   }],
-  couponCode: {
-    type: String,
-    trim: true,
-  },
-  discountPercentage: {
-    type: Number,
-    min: 0,
-    max: 100,
-  },
   image:{
     type: String,
   },

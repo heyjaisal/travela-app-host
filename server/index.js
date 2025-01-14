@@ -4,8 +4,9 @@ const passport = require('passport');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const authRoute = require('./routes/auth.routes');
-const authRoutes = require('./routes/routes');
+const authRoute = require('./routes/Gauth.routes');
+const authRoutes = require('./routes/auth.routes');
+const userRoutes = require('./routes/user.routes')
 require('dotenv').config();
 
 const app = express();
@@ -24,7 +25,6 @@ app.use(cors({
   credentials: true, 
 }));
 
-
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -37,7 +37,8 @@ app.use(passport.session());
 
 app.use(express.static('public'));
 
-app.use('/api', authRoutes); 
+app.use('/api/auth', authRoutes); 
+app.use('/api',userRoutes)
 app.use(authRoute);
 
 const port = process.env.PORT || 5000;

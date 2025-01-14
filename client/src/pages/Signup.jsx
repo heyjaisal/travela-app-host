@@ -59,7 +59,7 @@ const Signup = () => {
     e.preventDefault();
     if (validateFeilds()) {
       try {
-        await axios.post('http://localhost:5000/api/send-otp', { email: formData.email });
+        await axios.post('http://localhost:5000/api/auth/send-otp', { email: formData.email });
         setShowOtpPopup(true);
         setError({});
       } catch (err) {
@@ -70,7 +70,7 @@ const Signup = () => {
 
   const handleVerifyOtp = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/verify-otp', formData);
+      const response = await axios.post('http://localhost:5000/api/auth/verify-otp', formData);
       if (response.status === 201) {
         navigate('/login');
       }
@@ -102,7 +102,7 @@ const Signup = () => {
 
           {/* Render each specific error message under each input */}
           <div className="mb-3">
-            <label htmlFor="username" className="block text-gray-600 mb-2">Name</label>
+            <label htmlFor="username" className="block text-gray-600 mb-2">Username</label>
             <input
               id="username"
               type="text"

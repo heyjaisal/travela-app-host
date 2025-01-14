@@ -43,7 +43,7 @@ const UserNavbar = () => {
       {/* Desktop Sidebar */}
       <div
         className={`hidden md:flex flex-col ${
-          isHovered ? "w-64" : "w-18"
+          isHovered ? "w-64" : "w-18 bg-red-600"
         } text-slate-800 h-full transition-all duration-300`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}

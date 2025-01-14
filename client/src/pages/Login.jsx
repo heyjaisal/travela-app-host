@@ -30,42 +30,38 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const validateEmail = (email) => {
+  const validate = () => {
+    let temperror = {};
+  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Minimum 8 characters, at least one letter and one number
+  
+    if (!formData.email) {
+      temperror.email = "Email is required";
+    } else if (!emailRegex.test(formData.email)) {
+      temperror.email = "Enter a valid email address";
+    }
+  
+    if (!formData.password) {
+      temperror.password = "Password is required";
+    } else if (!passwordRegex.test(formData.password)) {
+      temperror.password = "Password must be at least 8 characters long and contain at least one letter and one number";
+    }
+  
+    setError(temperror);
+    return Object.keys(temperror).length === 0;
   };
-
-  const validatePassword = (password) => {
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
-    return passwordRegex.test(password);
-  };
+  
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    if (!email) {
-      setError("Please fill in both email.");
-      return;
-    }
-    if (!password) {
-      setError("Please fill in both password.");
-      return;
-    }
-
-    if (!validateEmail(email))
-      return setError("Please enter a valid email address.");
-    if (!validatePassword(password)) {
-      return setError(
-        "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character."
-      );
-    }
-
-    setError("");
+    if(validate()){
+      setError("");
 
     try {
-      const response = await axios.post("http://localhost:5000/api/login", {
+      const response = await axios.post("http://localhost:5000/api/auth/login", {
         email,
         password,
       });
@@ -81,6 +77,8 @@ const Login = () => {
       setError(err.response?.data?.error || "Login failed. Please try again.");
       console.error("Login error:", err);
     }
+    }
+
   };
 
   const handleGoogleSignup = () => {
@@ -118,24 +116,31 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+             {error.email && (
+              <p className="text-red-500 text-sm mt-1">{error.email}</p>
+            )}
           </div>
 
           <div className="mb-6">
           <label htmlFor="password" className="block text-gray-600 mb-2">Password</label>
             <div className="relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
                 placeholder="Enter your password"
                 className="w-full px-4 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <button
+               {error.password && (
+              <p className="text-red-500 text-sm mt-1">{error.password}</p>
+            )}
+               <button
                 type="button"
                 className="absolute inset-y-0 right-3 flex items-center text-gray-600"
+                onClick={() => setShowPassword((prev) => !prev)}
               >
-                Hide
+                {showPassword ? "Hide" : "Show"}
               </button>
             </div>
           </div>

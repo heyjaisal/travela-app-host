@@ -3,7 +3,7 @@ import AdminNavbar from "./Admin-navbar";
 
 const AdminDashboardLayout = () => {
   return (
-    <div className="flex h-screen">
+    <div className="flex  h-screen">
   
       <AdminNavbar />
    
