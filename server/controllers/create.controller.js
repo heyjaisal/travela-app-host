@@ -99,7 +99,6 @@ exports.addProperty = async (req, res) => {
     try {
       const file = req.file;
       const key = `${uuidv4()}-${file.originalname}`;
-  
       const params = {
         Bucket: process.env.S3_BUCKET_NAME,
         Key: key,
@@ -108,16 +107,14 @@ exports.addProperty = async (req, res) => {
         ACL: "public-read",
       };
   
+     
+      await s3.putObject(params).promise(); 
     
-      const uploadResult = await s3.putObject(params); // Using putObject method for upload
-  
-      // Construct the file URL after upload
       const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
-  
-      // Respond with the file URL
-      res.json({ url: fileUrl });
+      res.json({ imageUrl: fileUrl });
     } catch (error) {
       console.error("Error uploading to S3:", error);
       res.status(500).json({ error: "Failed to upload image" });
     }
   };
+  
