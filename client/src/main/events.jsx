@@ -213,7 +213,7 @@ const Events = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
       <div>
         <h2 className="text-lg font-semibold mb-4">Event Creation</h2>
         <form onSubmit={handleSubmit}>
@@ -425,13 +425,25 @@ const Events = () => {
             </li>
           ))}
         </ul>
+       
       </div>
       {/* map section  */}
       <div>
-        <div>
-          <ImageUpload onImageUpload={handleImageUpload} />
-          {eventForm.image && <img src={eventForm.image} alt="Uploaded" />}
+     
+
+      <ImageUpload onImageUpload={handleImageUpload} />
+
+      {eventForm.image && (
+        <div className="mt-4">
+          <img
+            src={eventForm.image}
+            alt="Uploaded"
+            className="max-w-full h-auto rounded-md border border-gray-300"
+          />
         </div>
+      )}
+
+       
         <h2 className="text-lg font-semibold mb-4">Pin point your location</h2>
         <div className="flex items-center mb-2">
           <input

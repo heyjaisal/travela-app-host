@@ -179,7 +179,7 @@ const Housing = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
       <div>
         <h2 className="text-lg font-semibold mb-4">Property Details</h2>
         <form onSubmit={housingSubmit}>

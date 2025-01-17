@@ -44,7 +44,7 @@ const UserNavbar = () => {
       <div
         className={`hidden md:flex flex-col ${
           isHovered ? "w-64" : "w-18"
-        } text-slate-800 h-full transition-all duration-300`}
+        } text-slate-800 h-full transition-all duration-300 top-0 sticky z-10`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

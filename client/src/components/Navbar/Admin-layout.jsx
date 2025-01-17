@@ -3,12 +3,10 @@ import AdminNavbar from "./Admin-navbar";
 
 const AdminDashboardLayout = () => {
   return (
-    <div className="flex  h-screen">
-  
+    <div className="flex">
       <AdminNavbar />
-   
-      <div className="flex-1 p-1 overflow-auto bg-lightBg">
-        <Outlet  />
+      <div className="flex-auto" >
+        <Outlet />
       </div>
     </div>
   );
