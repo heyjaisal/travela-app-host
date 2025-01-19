@@ -50,6 +50,7 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
     
 
     res.redirect(`${process.env.CLIENT_URL}/login?token=${token}&role=${host.role}`);
+    
   } catch (error) {
     console.error('Error during Google OAuth callback:', error);
     res.status(500).json({ message: `Internal server error: ${error.message}` });

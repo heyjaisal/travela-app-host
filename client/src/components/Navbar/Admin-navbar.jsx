@@ -8,7 +8,7 @@ import {
   FaRegCalendarAlt,
   FaBell,
   FaEnvelope,
-  FaCog ,
+  FaCog,
   FaPlus,
   FaUser,
   FaBars,
@@ -16,7 +16,11 @@ import {
 } from "react-icons/fa";
 
 const UserNavbar = () => {
-  const [user, setUser] = useState({ name: "", profileImage: "" });
+  const [user, setUser] = useState(() => {
+    // Check if user data is available in local storage
+    const savedUser = localStorage.getItem("userData");
+    return savedUser ? JSON.parse(savedUser) : { name: "", profileImage: "" };
+  });
   const [isHovered, setIsHovered] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -26,18 +30,22 @@ const UserNavbar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/profile", {
-          withCredentials: true,
-        });
-        setUser(response.data);
-        console.log(response.data);
+        if (!localStorage.getItem("userData")) {
+          const response = await axios.get("http://localhost:5000/api/profile", {
+            withCredentials: true,
+          });
+          setUser(response.data);
+          localStorage.setItem("userData", JSON.stringify(response.data));
+          console.log("Fetched user data:", response.data);
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
+        setUser({ name: "Guest", profileImage: "/client/public/no-profile.jpg" });
       }
     };
+
     fetchData();
   }, []);
-
   return (
     <>
       {/* Desktop Sidebar */}

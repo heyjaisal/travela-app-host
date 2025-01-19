@@ -140,7 +140,12 @@ const Housing = () => {
       try {
         const response = await axios.post(
           "http://localhost:5000/api/properties",
-          houseData,
+          {
+          house: houseData,
+          features:features
+
+          },
+
           {
             withCredentials: true,
           }

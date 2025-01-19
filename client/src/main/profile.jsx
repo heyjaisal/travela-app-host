@@ -34,7 +34,7 @@ const ProfilePage = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [dispatch]);
 
   const handleFieldChange = (e) => {
     const { name, value } = e.target;

@@ -5,7 +5,7 @@ const AdminDashboardLayout = () => {
   return (
     <div className="flex">
       <AdminNavbar />
-      <div className="flex-auto" >
+      <div className="flex-auto bg-lightBg" >
         <Outlet />
       </div>
     </div>
