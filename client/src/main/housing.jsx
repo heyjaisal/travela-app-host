@@ -1,23 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMapEvent,
-} from "react-leaflet";
-import { FaMap, FaTrash, FaUpload, FaEdit } from "react-icons/fa";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { ToastContainer, toast } from "react-toastify";
+import Feature from "../components/features";
 import ImageUpload from "../components/utils/ImageUpload";
+import MapComponent from "../components/Map";
 
 const Housing = () => {
   const [errors, setErrors] = useState({});
-  const [features, setfeatures] = useState([]);
-  const [featurestext, setfeaturestext] = useState("");
-  const [editfeatures, setEditfeatures] = useState(null);
-
-  const [houseData, sethouseData] = useState({
+  const [formData, setformData] = useState({
     propertyType: "apartment",
     size: "",
     price: "",
@@ -31,104 +22,39 @@ const Housing = () => {
     address: "",
     searchQuery: "",
     mapType: "satellite",
+    features: [],
+    featurestext: "",
+    editfeatures: null,
+    image: "",
   });
+
+  const handleDateTimeChange = (dateTime) => {
+    setformData({ ...formData, eventDateTime: dateTime });
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    sethouseData({ ...houseData, [name]: value });
-  };
-
-  const handleSearch = async () => {
-    try {
-      const response = await axios.get(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${houseData.searchQuery}`
-      );
-      const result = response.data[0];
-      if (result) {
-        const { lat, lon, display_name } = result;
-        sethouseData({
-          ...houseData,
-          location: { lat: parseFloat(lat), lng: parseFloat(lon) },
-          address: display_name,
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching location:", error);
-    }
-  };
-
-  const fetchAddress = async (lat, lng) => {
-    try {
-      const response = await axios.get(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-      );
-      const { display_name } = response.data;
-      sethouseData((prev) => ({ ...prev, address: display_name }));
-    } catch (error) {
-      console.error("Error fetching address:", error);
-    }
-  };
-
-  const handleAddTodo = () => {
-    if (featurestext.trim() === "") return;
-
-    if (editfeatures) {
-      setfeatures(
-        features.map((todo) =>
-          todo.id === editfeatures ? { ...todo, text: featurestext } : todo
-        )
-      );
-      setEditfeatures(null);
-    } else {
-      const newTodo = {
-        id: Date.now(),
-        text: featurestext.trim(),
-      };
-      setfeatures([...features, newTodo]);
-    }
-    setfeaturestext("");
-  };
-
-  const handleEditTodo = (id) => {
-    const todoToEdit = features.find((todo) => todo.id === id);
-    setfeaturestext(todoToEdit.text);
-    setEditfeatures(id);
-  };
-
-  const handleDeleteTodo = (id) => {
-    setfeatures(features.filter((todo) => todo.id !== id));
-  };
-
-  const handleMapClick = async (event) => {
-    const { lat, lng } = event.latlng;
-    sethouseData((prev) => ({ ...prev, location: { lat, lng } }));
-    fetchAddress(lat, lng);
+    setformData({ ...formData, [name]: value });
   };
 
   const increment = (field) => {
-    sethouseData((prev) => ({ ...prev, [field]: prev[field] + 1 }));
+    setformData((prev) => ({ ...prev, [field]: prev[field] + 1 }));
   };
 
   const decrement = (field) => {
-    sethouseData((prev) => ({
+    setformData((prev) => ({
       ...prev,
       [field]: Math.max(prev[field] - 1, 1),
     }));
   };
-  const maptype = () => {
-    sethouseData((prev) => ({
-      ...prev,
-      mapType: prev.mapType === "satellite" ? "terrain" : "satellite",
-    }));
-  };
 
   const validateFields = () => {
-    let tempErrors = {};
-    if (!houseData.size) tempErrors.size = "Size is required";
-    if (!houseData.price) tempErrors.price = "Price is required";
-    if (!houseData.description)
+    const tempErrors = {};
+    if (!formData.size) tempErrors.size = "Size is required";
+    if (!formData.price) tempErrors.price = "Price is required";
+    if (!formData.description)
       tempErrors.description = "Description is required";
-    if (!houseData.location.lat || !houseData.location.lng)
+    if (!formData.location.lat || !formData.location.lng)
       tempErrors.location = "Location is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
@@ -140,19 +66,11 @@ const Housing = () => {
       try {
         const response = await axios.post(
           "http://localhost:5000/api/properties",
-          {
-          house: houseData,
-          features:features
-
-          },
-
-          {
-            withCredentials: true,
-          }
+          { house: formData },
+          { withCredentials: true }
         );
-        console.log("Success:", response.data);
         toast.success("Property details submitted successfully!");
-        sethouseData({
+        setformData({
           propertyType: "apartment",
           size: "",
           price: "",
@@ -166,21 +84,20 @@ const Housing = () => {
           address: "",
           searchQuery: "",
           mapType: "satellite",
+          features: [],
+          featurestext: "",
+          editfeatures: null,
+          image: "",
         });
-        setfeatures([]);
       } catch (error) {
         console.error("Error:", error);
         toast.error("Failed to submit property details.");
       }
     }
   };
-  const handleImageUpload = (imageUrl) => {
-    sethouseData({ ...houseData, image: imageUrl });
-  };
 
-  const MapClick = () => {
-    useMapEvent("click", handleMapClick);
-    return null;
+  const handleImageUpload = (imageUrl) => {
+    setformData({ ...formData, image: imageUrl });
   };
 
   return (
@@ -198,7 +115,7 @@ const Housing = () => {
             <select
               id="property-type"
               name="propertyType"
-              value={houseData.propertyType}
+              value={formData.propertyType}
               onChange={handleInputChange}
               className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
             >
@@ -221,7 +138,7 @@ const Housing = () => {
               type="number"
               id="size"
               name="size"
-              value={houseData.size}
+              value={formData.size}
               onChange={handleInputChange}
               min="0"
               className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
@@ -243,7 +160,7 @@ const Housing = () => {
               type="number"
               id="price"
               name="price"
-              value={houseData.price}
+              value={formData.price}
               onChange={handleInputChange}
               min="0"
               className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
@@ -264,7 +181,7 @@ const Housing = () => {
             <textarea
               id="description"
               name="description"
-              value={houseData.description}
+              value={formData.description}
               onChange={handleInputChange}
               rows="3"
               className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
@@ -272,6 +189,27 @@ const Housing = () => {
             />
             {errors.description && (
               <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+            )}
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-700">
+              Event Date and Time
+            </label>
+            <DateTimePicker
+              sx={{ width: "100%" }}
+              value={formData.eventDateTime}
+              onChange={handleDateTimeChange}
+              textFeild={(params) => (
+                <input
+                  {...params}
+                  className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-700 focus:outline-none text-pink-900"
+                />
+              )}
+            />
+            {errors.eventDateTime && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.eventDateTime}
+              </p>
             )}
           </div>
 
@@ -296,7 +234,7 @@ const Housing = () => {
                   <input
                     type="number"
                     name={field}
-                    value={houseData[field]}
+                    value={formData[field]}
                     onChange={handleInputChange}
                     className="w-16 text-center font-semibold text-xl px-3 py-1 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
                   />
@@ -312,137 +250,30 @@ const Housing = () => {
             )
           )}
         </form>
-        <div className="mb-4">
-          <label className="block text-sm font-poppins font-bold text-gray-700">
-            Add new features
-          </label>
-          <div className="flex">
-            <input
-              type="text"
-              value={featurestext}
-              onChange={(e) => setfeaturestext(e.target.value)}
-              placeholder={
-                editfeatures ? "Edit feature" : "Enter a new feature"
-              }
-              className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
-            />
-            <button
-              type="button"
-              onClick={handleAddTodo}
-              className="ml-4 mt-2 p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            >
-              {editfeatures ? "Save" : "Add"}
-            </button>
-          </div>
-        </div>
-        <ul>
-          {features.map((todo) => (
-            <li
-              key={todo.id}
-              className="flex justify-between items-center mt-2 p-3 bg-gray-100 rounded-lg shadow-sm"
-            >
-              <span className="cursor-pointer text-gray-800">{todo.text}</span>
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => handleEditTodo(todo.id)}
-                  className="text-blue-500 hover:text-blue-700 focus:outline-none"
-                  title="Edit"
-                >
-                  <FaEdit className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => handleDeleteTodo(todo.id)}
-                  className="text-red-500 hover:text-red-700 focus:outline-none"
-                  title="Delete"
-                >
-                  <FaTrash className="w-5 h-5" />
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <Feature formData={formData} setformData={setformData} />
       </div>
       {/* map section  */}
       <div>
         <div>
           <ImageUpload onImageUpload={handleImageUpload} />
-          {houseData.image && <img src={houseData.image} alt="Uploaded" />}
+          {formData.image && <img src={formData.image} alt="Uploaded" />}
         </div>
 
         <h2 className="text-lg font-semibold mb-4">Pin point your location</h2>
 
-        <div className="flex items-center mb-2">
-          <input
-            type="text"
-            name="searchQuery"
-            value={houseData.searchQuery}
-            onChange={handleInputChange}
-            placeholder="Search for a place"
-            className="py-2 my-2 mr-3 px-3 rounded-lg text-center border border-gray-300 w-48"
-          />
-          <button
-            onClick={handleSearch}
-            className="py-2 px-4 bg-purple-600 text-white rounded-lg "
-          >
-            Search
-          </button>
-          <div>
-            <button
-              onClick={maptype}
-              className="text-xl bg-white p-2 rounded-full shadow-md ml-3"
-            >
-              <FaMap />
-            </button>
-          </div>
-        </div>
-
-        {/* Map */}
-        <div className="relative z-10">
-          <MapContainer
-            center={houseData.location || { lat: 51.505, lng: -0.09 }}
-            zoom={19}
-            scrollWheelZoom={true}
-            style={{ height: "400px", width: "100%" }}
-            onClick={handleMapClick}
-          >
-            {houseData.mapType === "satellite" && (
-              <>
-                <TileLayer
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                  attribution='Tiles &copy; <a href="https://www.esri.com/">Esri</a>'
-                />
-                <TileLayer
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
-                  attribution='Labels &copy; <a href="https://www.esri.com/">Esri</a>'
-                />
-              </>
-            )}
-            {houseData.mapType === "terrain" && (
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="&copy; OpenStreetMap contributors"
-              />
-            )}
-            <MapClick />
-            <Marker
-              position={houseData.location || { lat: 51.505, lng: -0.09 }}
-            >
-              <Popup>{houseData.address}</Popup>
-            </Marker>
-          </MapContainer>
-        </div>
+        <MapComponent formData={formData} setformData={setformData} />
 
         <div className="mt-4">
-          <p>Location: {houseData.address}</p>
-          <p>Latitude: {houseData.location.lat}</p>
-          <p>Longitude: {houseData.location.lng}</p>
+          <p>Location: {formData.address}</p>
+          <p>Latitude: {formData.location.lat}</p>
+          <p>Longitude: {formData.location.lng}</p>
         </div>
 
         <div className="flex space-x-4 mt-4">
           <button
             type="button"
             onClick={() => {
-              sethouseData({
+              setformData({
                 propertyType: "apartment",
                 size: "",
                 price: "",

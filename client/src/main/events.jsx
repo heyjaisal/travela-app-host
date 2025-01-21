@@ -1,24 +1,15 @@
 import React, { useState } from "react";
 import axios from "axios";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMapEvent,
-} from "react-leaflet";
-import { FaMap, FaTrash, FaUpload, FaEdit } from "react-icons/fa";
+import Feature from "../components/features";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { ToastContainer, toast } from "react-toastify";
 import ImageUpload from "../components/utils/ImageUpload";
+import MapComponent from "../components/Map";
 
 const Events = () => {
   const [errors, setErrors] = useState({});
-  const [features, setfeatures] = useState([]);
-  const [featurestext, setfeaturestext] = useState("");
-  const [editfeatures, setEditfeatures] = useState(null);
 
-  const [eventForm, setEventForm] = useState({
+  const [formData, setformData] = useState({
     eventType: "concert",
     title: "",
     eventVenue: "",
@@ -31,109 +22,41 @@ const Events = () => {
     isFreeTicket: false,
     searchQuery: "",
     mapType: "satellite",
+    features: [],
+    featurestext: "",
+    editfeatures: null,
     image: "",
   });
 
-  const handleEventChange = (e) => {
-    const { name, value } = e.target;
-    setEventForm({ ...eventForm, [name]: value });
+  const handleDateTimeChange = (dateTime) => {
+    setformData({ ...formData, eventDateTime: dateTime });
   };
 
-  const handleDateTimeChange = (dateTime) => {
-    setEventForm({ ...eventForm, eventDateTime: dateTime });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setformData({ ...formData, [name]: value });
   };
+
+
 
   const handleFreeTicket = () => {
-    setEventForm((prev) => ({
+    setformData((prev) => ({
       ...prev,
       isFreeTicket: true,
       ticketPrice: 0,
     }));
   };
-  const maptype = () => {
-    setEventForm((prev) => ({
-      ...prev,
-      mapType: prev.mapType === "satellite" ? "terrain" : "satellite",
-    }));
-  };
 
   const handleImageUpload = (imageUrl) => {
-    setHouseData({ ...eventForm, image: imageUrl });
-  };
-
-  const handleSearch = async () => {
-    try {
-      const response = await axios.get(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${eventForm.searchQuery}`
-      );
-      const result = response.data[0];
-      if (result) {
-        const { lat, lon, display_name } = result;
-        setEventForm({
-          ...eventForm,
-          location: { lat: parseFloat(lat), lng: parseFloat(lon) },
-          address: display_name,
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching location:", error);
-    }
-  };
-
-  const handleAddTodo = () => {
-    if (featurestext.trim() === "") return;
-
-    if (editfeatures) {
-      setfeatures(
-        features.map((todo) =>
-          todo.id === editfeatures ? { ...todo, text: featurestext } : todo
-        )
-      );
-      setEditfeatures(null);
-    } else {
-      const newTodo = {
-        id: Date.now(),
-        text: featurestext.trim(),
-      };
-      setfeatures([...features, newTodo]);
-    }
-    setfeaturestext("");
-  };
-
-  const handleEditTodo = (id) => {
-    const todoToEdit = features.find((todo) => todo.id === id);
-    setfeaturestext(todoToEdit.text);
-    setEditfeatures(id);
-  };
-
-  const handleDeleteTodo = (id) => {
-    setfeatures(features.filter((todo) => todo.id !== id));
-  };
-
-  const fetchAddress = async (lat, lng) => {
-    try {
-      const response = await axios.get(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-      );
-      const { display_name } = response.data;
-      setEventForm((prev) => ({ ...prev, address: display_name }));
-    } catch (error) {
-      console.error("Error fetching address:", error);
-    }
-  };
-
-  const handleMapClick = async (event) => {
-    const { lat, lng } = event.latlng;
-    setEventForm((prev) => ({ ...prev, location: { lat, lng } }));
-    fetchAddress(lat, lng);
+    setHouseData({ ...formData, image: imageUrl });
   };
 
   const increment = (field) => {
-    setEventForm((prev) => ({ ...prev, [field]: prev[field] + 1 }));
+    setformData((prev) => ({ ...prev, [field]: prev[field] + 1 }));
   };
 
   const decrement = (field) => {
-    setEventForm((prev) => ({
+    setformData((prev) => ({
       ...prev,
       [field]: Math.max(prev[field] - 1, 1),
     }));
@@ -141,26 +64,25 @@ const Events = () => {
 
   const validateFields = () => {
     let tempErrors = {};
-    if (!eventForm.title) tempErrors.title = "Title is required";
-    if (!eventForm.eventVenue)
-      tempErrors.eventVenue = "Event venue is required";
+    if (!formData.title) tempErrors.title = "Title is required";
+    if (!formData.eventVenue) tempErrors.eventVenue = "Event venue is required";
     if (
-      !eventForm.isFreeTicket &&
-      (!eventForm.ticketPrice || eventForm.ticketPrice <= 0) &&
-      eventForm.ticketPrice !== 0
+      !formData.isFreeTicket &&
+      (!formData.ticketPrice || formData.ticketPrice <= 0) &&
+      formData.ticketPrice !== 0
     )
       tempErrors.ticketPrice =
         "Ticket price must be greater than zero or 'Free'";
-    if (!eventForm.description)
+    if (!formData.description)
       tempErrors.description = "Description is required";
-    if (!eventForm.location.lat || !eventForm.location.lng)
+    if (!formData.location.lat || !formData.location.lng)
       tempErrors.location = "Location is required";
-    if (!eventForm.eventDateTime)
+    if (!formData.eventDateTime)
       tempErrors.eventDateTime = "Event date and time are required";
-    else if (eventForm.eventDateTime < new Date()) {
+    else if (formData.eventDateTime < new Date()) {
       tempErrors.eventDateTime = "Event date and time must be in the future";
     }
-    if (features.length === 0) {
+    if (formData.features.length === 0) {
       tempErrors.features = "At least one feature is required";
     }
     setErrors(tempErrors);
@@ -175,8 +97,7 @@ const Events = () => {
         const response = await axios.post(
           "http://localhost:5000/api/events",
           {
-            event: eventForm,
-            features: features,
+            event: formData,
           },
           {
             withCredentials: true,
@@ -185,7 +106,7 @@ const Events = () => {
 
         console.log("Success:", response.data);
         toast.success("Event details submitted successfully!");
-        setEventForm({
+        setformData({
           eventType: "concert",
           title: "",
           eventVenue: "",
@@ -197,19 +118,16 @@ const Events = () => {
           address: "",
           isFreeTicket: false,
           mapType: "satellite",
+          features: [],
+          featurestext: "",
+          editfeatures: null,
           image: "",
         });
-        setfeatures([]);
       } catch (error) {
         console.error("Error:", error);
         toast.error("Failed to submit event details.");
       }
     }
-  };
-
-  const MapClick = () => {
-    useMapEvent("click", handleMapClick);
-    return null;
   };
 
   return (
@@ -223,8 +141,8 @@ const Events = () => {
             </label>
             <select
               name="eventType"
-              value={eventForm.eventType}
-              onChange={handleEventChange}
+              value={formData.eventType}
+              onChange={handleInputChange}
               className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
             >
               <option value="concert">Concert</option>
@@ -247,8 +165,8 @@ const Events = () => {
             <input
               type="text"
               name="title"
-              value={eventForm.title}
-              onChange={handleEventChange}
+              value={formData.title}
+              onChange={handleInputChange}
               className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
               placeholder="Enter Title"
             />
@@ -263,8 +181,8 @@ const Events = () => {
             <input
               type="text"
               name="eventVenue"
-              value={eventForm.eventVenue}
-              onChange={handleEventChange}
+              value={formData.eventVenue}
+              onChange={handleInputChange}
               className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
               placeholder="Enter Event Venue"
             />
@@ -280,11 +198,11 @@ const Events = () => {
               <input
                 type="number"
                 name="ticketPrice"
-                value={eventForm.isFreeTicket ? 0 : eventForm.ticketPrice}
-                onChange={handleEventChange}
-                disabled={eventForm.isFreeTicket}
+                value={formData.isFreeTicket ? 0 : formData.ticketPrice}
+                onChange={handleInputChange}
+                disabled={formData.isFreeTicket}
                 placeholder={
-                  eventForm.isFreeTicket
+                  formData.isFreeTicket
                     ? "Free Ticket"
                     : "Enter the ticket price"
                 }
@@ -313,8 +231,8 @@ const Events = () => {
             <textarea
               id="description"
               name="description"
-              value={eventForm.description}
-              onChange={handleEventChange}
+              value={formData.description}
+              onChange={handleInputChange}
               rows="3"
               className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
               placeholder="Enter description"
@@ -329,7 +247,7 @@ const Events = () => {
             </label>
             <DateTimePicker
               sx={{ width: "100%" }}
-              value={eventForm.eventDateTime}
+              value={formData.eventDateTime}
               onChange={handleDateTimeChange}
               textFeild={(params) => (
                 <input
@@ -359,8 +277,8 @@ const Events = () => {
               <input
                 type="number"
                 name="maxGuests"
-                value={eventForm.maxGuests}
-                onChange={handleEventChange}
+                value={formData.maxGuests}
+                onChange={handleInputChange}
                 className="w-16 text-center font-semibold text-xl px-3 py-1 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
               <button
@@ -375,145 +293,37 @@ const Events = () => {
         </form>
 
         {/* Add features */}
-        <div className="mb-4">
-          <label className="block text-sm font-poppins font-bold text-gray-700">
-            Add new features
-          </label>
-          <div className="flex">
-            <input
-              type="text"
-              value={featurestext}
-              onChange={(e) => setfeaturestext(e.target.value)}
-              placeholder={
-                editfeatures ? "Edit feature" : "Enter a new feature"
-              }
-              className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
-            />
-            <button
-              type="button"
-              onClick={handleAddTodo}
-              className="ml-4 mt-2 p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            >
-              {editfeatures ? "Save" : "Add"}
-            </button>
-          </div>
-        </div>
-
-        <ul>
-          {features.map((todo) => (
-            <li
-              key={todo.id}
-              className="flex justify-between items-center mt-2 p-3 bg-gray-100 rounded-lg shadow-sm"
-            >
-              <span className="cursor-pointer text-gray-800">{todo.text}</span>
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => handleEditTodo(todo.id)}
-                  className="text-blue-500 hover:text-blue-700 focus:outline-none"
-                  title="Edit"
-                >
-                  <FaEdit className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => handleDeleteTodo(todo.id)}
-                  className="text-red-500 hover:text-red-700 focus:outline-none"
-                  title="Delete"
-                >
-                  <FaTrash className="w-5 h-5" />
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-       
+        <Feature formData={formData} setformData={setformData} />
       </div>
       {/* map section  */}
       <div>
-     
+        <ImageUpload onImageUpload={handleImageUpload} />
 
-      <ImageUpload onImageUpload={handleImageUpload} />
+        {formData.image && (
+          <div className="mt-4">
+            <img
+              src={formData.image}
+              alt="Uploaded"
+              className="max-w-full h-auto rounded-md border border-gray-300"
+            />
+          </div>
+        )}
 
-      {eventForm.image && (
-        <div className="mt-4">
-          <img
-            src={eventForm.image}
-            alt="Uploaded"
-            className="max-w-full h-auto rounded-md border border-gray-300"
-          />
-        </div>
-      )}
-
-       
         <h2 className="text-lg font-semibold mb-4">Pin point your location</h2>
-        <div className="flex items-center mb-2">
-          <input
-            type="text"
-            name="searchQuery"
-            value={eventForm.searchQuery}
-            onChange={handleEventChange}
-            placeholder="Search for a place"
-            className="py-2 px-3 border border-gray-300 rounded-lg mr-2 w-48"
-          />
-          <button
-            onClick={handleSearch}
-            className="py-2 px-4 bg-purple-600 text-white rounded-lg"
-          >
-            Search
-          </button>
-          <button
-            onClick={maptype}
-            className="text-xl bg-white p-2 rounded-full shadow-md ml-3"
-          >
-            <FaMap />
-          </button>
-        </div>
 
-        <div className="relative z-10">
-          <MapContainer
-            center={eventForm.location || { lat: 51.505, lng: -0.09 }}
-            zoom={19}
-            scrollWheelZoom={true}
-            style={{ height: "400px", width: "100%" }}
-            onClick={handleMapClick}
-          >
-            {eventForm.mapType === "satellite" && (
-              <>
-                <TileLayer
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                  attribution='Tiles &copy; <a href="https://www.esri.com/">Esri</a>'
-                />
-                <TileLayer
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
-                  attribution='Labels &copy; <a href="https://www.esri.com/">Esri</a>'
-                />
-              </>
-            )}
-            {eventForm.mapType === "terrain" && (
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="&copy; OpenStreetMap contributors"
-              />
-            )}
-            <MapClick />
-            <Marker
-              position={eventForm.location || { lat: 51.505, lng: -0.09 }}
-            >
-              <Popup>{eventForm.address}</Popup>
-            </Marker>
-          </MapContainer>
-        </div>
+        <MapComponent formData={formData} setformData={setformData} />
 
         <div className="mt-4">
-          <p>Address: {eventForm.address}</p>
-          <p>Latitude: {eventForm.location.lat}</p>
-          <p>Longitude: {eventForm.location.lng}</p>
+          <p>Address: {formData.address}</p>
+          <p>Latitude: {formData.location.lat}</p>
+          <p>Longitude: {formData.location.lng}</p>
         </div>
 
         <div className="flex space-x-4 mt-4">
           <button
             type="button"
             onClick={() => {
-              setEventForm({
+              setformData({
                 eventType: "concert",
                 title: "",
                 eventVenue: "",
