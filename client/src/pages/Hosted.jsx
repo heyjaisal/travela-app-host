@@ -1,9 +1,15 @@
 import React,{useState} from 'react'
 import EventUpdate from '../main/update.event';
 import HouseUpdate from '../main/update.housing';
+import { useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
 
 const hosted = () => {
   const [activeTab, setActiveTab] = useState("housing");
+  const navigate = useNavigate();
+  const handleClose = () => {
+    navigate("/"); // Redirect to the homepage when X is clicked
+  };
 
   return (
     <div className="pb-16 p-3 bg-lightBg">
@@ -24,6 +30,9 @@ const hosted = () => {
           Event
         </button>
       </div>
+      <button onClick={handleClose} className="absolute top-4 right-4 text-gray-700">
+        <X className="w-6 h-6" />
+      </button>
 
       <div>
         {activeTab === "housing" ? <HouseUpdate /> : <EventUpdate />}

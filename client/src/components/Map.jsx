@@ -58,6 +58,7 @@ const MapComponent = ({ formData, setformData }) => {
 
   return (
     <div>
+       <h2 className="text-lg font-semibold mb-4">Pin point your location</h2>
       <div className="flex items-center mb-2">
         <input
           type="text"

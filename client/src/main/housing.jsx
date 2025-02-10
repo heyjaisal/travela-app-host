@@ -3,8 +3,8 @@ import axios from "axios";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { ToastContainer, toast } from "react-toastify";
 import Feature from "../components/features";
-import ImageUpload from "../components/utils/ImageUpload";
 import MapComponent from "../components/Map";
+import ImageUploader from "@/components/imageupload";
 
 const Housing = () => {
   const [errors, setErrors] = useState({});
@@ -16,6 +16,7 @@ const Housing = () => {
     bedrooms: 0,
     kitchen: 0,
     bathrooms: 0,
+    houseDateTime:null,
     maxGuests: 0,
     maxStay: 0,
     location: { lat: 51.505, lng: -0.09 },
@@ -35,6 +36,7 @@ const Housing = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setformData({ ...formData, [name]: value });
+    
   };
 
   const increment = (field) => {
@@ -46,6 +48,29 @@ const Housing = () => {
       ...prev,
       [field]: Math.max(prev[field] - 1, 1),
     }));
+  };
+
+  const handleCancel = () => {
+    setformData({
+      propertyType: "apartment",
+      size: "",
+      price: "",
+      description: "",
+      bedrooms: 0,
+      kitchen: 0,
+      bathrooms: 0,
+      houseDateTime: null,
+      maxGuests: 0,
+      maxStay: 0,
+      location: { lat: 51.505, lng: -0.09 },
+      address: "",
+      searchQuery: "",
+      mapType: "satellite",
+      features: [], 
+      featurestext: "",
+      editfeatures: null,
+      image: "",
+    });
   };
 
   const validateFields = () => {
@@ -65,39 +90,17 @@ const Housing = () => {
     if (validateFields()) {
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/properties",
-          { house: formData },
+          "http://localhost:5000/api/add",
+          { data: formData , type:'property'},
           { withCredentials: true }
         );
         toast.success("Property details submitted successfully!");
-        setformData({
-          propertyType: "apartment",
-          size: "",
-          price: "",
-          description: "",
-          bedrooms: 0,
-          kitchen: 0,
-          bathrooms: 0,
-          maxGuests: 0,
-          maxStay: 0,
-          location: { lat: 51.505, lng: -0.09 },
-          address: "",
-          searchQuery: "",
-          mapType: "satellite",
-          features: [],
-          featurestext: "",
-          editfeatures: null,
-          image: "",
-        });
+        handleCancel()
       } catch (error) {
         console.error("Error:", error);
         toast.error("Failed to submit property details.");
       }
     }
-  };
-
-  const handleImageUpload = (imageUrl) => {
-    setformData({ ...formData, image: imageUrl });
   };
 
   return (
@@ -197,7 +200,7 @@ const Housing = () => {
             </label>
             <DateTimePicker
               sx={{ width: "100%" }}
-              value={formData.eventDateTime}
+              value={formData.houseDateTime}
               onChange={handleDateTimeChange}
               textFeild={(params) => (
                 <input
@@ -254,12 +257,16 @@ const Housing = () => {
       </div>
       {/* map section  */}
       <div>
-        <div>
-          <ImageUpload onImageUpload={handleImageUpload} />
-          {formData.image && <img src={formData.image} alt="Uploaded" />}
-        </div>
-
-        <h2 className="text-lg font-semibold mb-4">Pin point your location</h2>
+      <ImageUploader formData={formData} setformData={setformData} type='housing'/>
+        {formData.image && (
+          <div className="mt-4">
+            <img
+              src={formData.image}
+              alt="Uploaded"
+              className="max-w-full h-auto rounded-md border border-gray-300"
+            />
+          </div>
+        )}
 
         <MapComponent formData={formData} setformData={setformData} />
 
@@ -272,23 +279,7 @@ const Housing = () => {
         <div className="flex space-x-4 mt-4">
           <button
             type="button"
-            onClick={() => {
-              setformData({
-                propertyType: "apartment",
-                size: "",
-                price: "",
-                description: "",
-                bedrooms: 0,
-                kitchen: 0,
-                bathrooms: 0,
-                maxGuests: 0,
-                maxStay: 0,
-                location: { lat: 51.505, lng: -0.09 },
-                address: "",
-                searchQuery: "",
-                mapType: "satellite",
-              });
-            }}
+            onClick={handleCancel}
             className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 focus:ring-2 focus:ring-gray-400 focus:outline-none flex-1"
           >
             Cancel

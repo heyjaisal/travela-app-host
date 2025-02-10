@@ -3,8 +3,8 @@ import axios from "axios";
 import Feature from "../components/features";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { ToastContainer, toast } from "react-toastify";
-import ImageUpload from "../components/utils/ImageUpload";
 import MapComponent from "../components/Map";
+import ImageUploader from "@/components/imageupload";
 
 const Events = () => {
   const [errors, setErrors] = useState({});
@@ -25,8 +25,11 @@ const Events = () => {
     features: [],
     featurestext: "",
     editfeatures: null,
-    image: "",
+    image: null,    
+    public_id: "", 
+    imageFile: null,
   });
+  
 
   const handleDateTimeChange = (dateTime) => {
     setformData({ ...formData, eventDateTime: dateTime });
@@ -45,10 +48,6 @@ const Events = () => {
       isFreeTicket: true,
       ticketPrice: 0,
     }));
-  };
-
-  const handleImageUpload = (imageUrl) => {
-    setHouseData({ ...formData, image: imageUrl });
   };
 
   const increment = (field) => {
@@ -95,9 +94,9 @@ const Events = () => {
     if (validateFields()) {
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/events",
+          "http://localhost:5000/api/add",
           {
-            event: formData,
+            data: formData, type:'event'
           },
           {
             withCredentials: true,
@@ -297,7 +296,9 @@ const Events = () => {
       </div>
       {/* map section  */}
       <div>
-        <ImageUpload onImageUpload={handleImageUpload} />
+    
+   <ImageUploader formData={formData} setformData={setformData} type='event' />
+    
 
         {formData.image && (
           <div className="mt-4">
@@ -308,8 +309,6 @@ const Events = () => {
             />
           </div>
         )}
-
-        <h2 className="text-lg font-semibold mb-4">Pin point your location</h2>
 
         <MapComponent formData={formData} setformData={setformData} />
 

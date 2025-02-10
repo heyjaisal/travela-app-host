@@ -1,12 +1,19 @@
 import React, { useState } from "react";
+import { X } from "lucide-react"; 
 import Events from "../main/events";
 import Housing from "../main/housing";
+import { useNavigate } from "react-router-dom";
 
 const HostPage = () => {
   const [activeTab, setActiveTab] = useState("housing");
+  const navigate = useNavigate(); 
+
+  const handleClose = () => {
+    navigate("/");
+  };
 
   return (
-    <div className="pb-16 p-3 bg-lightBg">
+    <div className="pb-5 p-3 bg-lightBg z-50">
       <h1 className="text-xl pl-3.5 pt-2 font-bold">Host</h1>
 
       {/* Sticky Navbar */}
@@ -24,6 +31,10 @@ const HostPage = () => {
           Event
         </button>
       </div>
+
+      <button onClick={handleClose} className="absolute top-4 right-4 text-gray-700">
+        <X className="w-6 h-6" />
+      </button>
 
       <div>
         {activeTab === "housing" ? <Housing /> : <Events />}

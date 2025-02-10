@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import Profile from "../main/profile";
 import Settings from "../main/settings";
+import { useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
 
 const Account = () => {
   const [activeTab, setActiveTab] = useState("profile");
+
+  const navigate = useNavigate(); 
+
+  const handleClose = () => {
+    navigate("/");
+  };
 
   return ( 
     <div className="p-4 pb-16 bg-lightBg overflow-hidden">
@@ -23,6 +31,9 @@ const Account = () => {
           Settings
         </button>
       </div>
+      <button onClick={handleClose} className="absolute top-4 right-4 text-gray-700">
+        <X className="w-6 h-6" />
+      </button>
 
       {activeTab === "profile" ? <Profile /> : <Settings />}
     </div>

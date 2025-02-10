@@ -1,20 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './Reducer';
-import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+import { configureStore } from "@reduxjs/toolkit";
+import chatReducer from "../redux/slice/chat";
+import authReducer from "../redux/slice/auth";
 
-const persistConfig = {
-  key: 'root',
-  storage,
-};
-
-const persistedReducer = persistReducer(persistConfig, authReducer);
-
-const store = configureStore({
+export const store = configureStore({
   reducer: {
-    auth: persistedReducer,
+    chat: chatReducer,
+    auth: authReducer,
   },
 });
-
-const persistor = persistStore(store);
-export { store, persistor };

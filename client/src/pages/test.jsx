@@ -1,6 +1,6 @@
 import React from 'react'
 
-const messages = () => {
+const test = () => {
   return (
     <div>
       
@@ -8,4 +8,4 @@ const messages = () => {
   )
 }
 
-export default messages
+export default test

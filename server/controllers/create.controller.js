@@ -1,170 +1,106 @@
-const Host = require("../model/profile");
 const Event = require("../model/events");
 const Property = require("../model/housing");
-const s3 = require("../config/aws-s3");
-const { v4: uuidv4 } = require("uuid");
+const cloudinary = require('../config/cloudinary')
+const Host = require("../model/profile")
+const Housing = require("../model/housing")
+
 require("dotenv").config();
 
-exports.addProperty = async (req, res) => {
+exports.handleRequest = async (req, res) => {
   try {
-    const { house, features } = req.body;
+    const { data, features, type } = req.body;
+    const userId = req.userId;
+    const Model = type === "property" ? Property : Event;
 
-    console.log(req.body);
-    
-    const userId = req.user.id;
-
-    const newProperty = new Property({
-      ...house,
-      features:features,
+    const newItem = new Model({
+      ...data,
       host: userId,
     });
 
-    await newProperty.save();
-
-    res
-      .status(201)
-      .json({ message: "Property added successfully", property: newProperty });
+    await newItem.save();
+    res.status(201).json({ message: `${type} added successfully`, item: newItem });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({
-        message: "Failed to add property",
-        error: error.message || "Unknown error",
-      });
+    res.status(500).json({ message: `Failed to add`, error: error.message || "Unknown error" });
   }
 };
 
-exports.eventproperty = async (req, res) => {
-  const { event, features } = req.body;
-  
-  console.log(req.body);
-
-  const userId = req.user.id;
-
-  console.log(userId);
-
-  const newEvent = new Event({
-    ...event,
-    features: features,
-    host: userId,
-  });
-
-  try {
-    await newEvent.save();
-    res.status(201).json(newEvent);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to save event" });
-  }
-};
-
-exports.updateprofile = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const updatedData = req.body;
-
-    const phoneExists = await Host.findOne({ phone: updatedData.phone });
-    if (phoneExists && phoneExists.id !== userId) {
-      return res.status(400).json({ message: "Phone number already exists" });
-    }
-
-    const updatedUser = await Host.findByIdAndUpdate(userId, updatedData, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.status(200).json({
-      message: "Profile updated successfully",
-      data: updatedUser,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Error updating profile", error });
-  }
-};
-
-exports.getHost = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const user = await Host.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching profile", error });
-  }
-};
 
 exports.uploadImage = async (req, res) => {
   try {
-    const file = req.file;
-    const key = `${uuidv4()}-${file.originalname}`;
-    const params = {
-      Bucket: process.env.S3_BUCKET_NAME,
-      Key: key,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-      ACL: "public-read",
-    };
-
-    await s3.putObject(params).promise();
-
-    const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
-    res.json({ imageUrl: fileUrl });
-  } catch (error) {
-    console.error("Error uploading to S3:", error);
-    res.status(500).json({ error: "Failed to upload image" });
-  }
-};
-
-exports.getEvents = async (req, res) => {
-  const userId = req.user.id;
-  console.log(userId);
-  
-  try {
-    
-    const hostedEvents = await Event.find({ host: userId});
-    console.log(hostedEvents);
-    
-    
-    if (!hostedEvents.length) {
-      return res.status(404).json({ message: 'No events found for this host' });
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
     }
 
-    res.status(200).json(hostedEvents);
+    const folderMap = {
+      profile: "profile-images",
+      event: "event-images",
+      housing: "housing-images",
+    };
+
+    const folder = folderMap[req.body.type] || "default-images";
+
+    const { secure_url: imageUrl, public_id } = await cloudinary.uploader.upload(req.file.path, { folder });
+
+    if (req.body.type === "profile") {
+     
+      
+      const updatedUser = await Host.findByIdAndUpdate(
+        req.userId,
+        { image: imageUrl},
+        { new: true }
+      );
+   
+    }
+
+    res.status(200).json({ imageUrl, public_id, type: req.body.type });
   } catch (error) {
-    console.error("Error fetchind events details: ",error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error uploading image:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-exports.getHouse = async (req,res) =>{
-  const userId = req.user.id;
-  console.log(userId);
 
-  try{
-    const houses = Property.find({host:userId})
+exports.deleteImage = async (req, res) => {
+  try {
+    const { image, type } = req.body;
     
-  
+    if (!image || !type) return res.status(400).json({ message: "No image or type provided" });
 
-    
+    const models = { profile: Host, event: Event, housing: Housing };
+    const model = models[type];
+    if (!model) return res.status(400).json({ message: "Invalid type" });
 
-  if(!houses.length){
-    return res.status(404).json({message : 'No House found'})
+    const record = await model.findById(req.userId);
+    const publicId = image.split("/").pop().split(".")[0];
+    const folder = `${type}-images`;
+
+    if (record?.image === image) {
+      await cloudinary.uploader.destroy(`${folder}/${publicId}`);
+      await model.findByIdAndUpdate(req.userId, { image: null }, { new: true });
+      return res.status(200).json({ message: "Image deleted from both database and Cloudinary" });
+    }
+
+    await cloudinary.uploader.destroy(`${folder}/${publicId}`);
+    return res.status(200).json({ message: "Image deleted from Cloudinary" });
+
+  } catch (error) {
+    console.error("Error deleting image:", error);
+    res.status(500).json({ message: "Server error" });
   }
-  res.status(200).json(houses)
+};
 
-  }catch(error){
-    console.error("Error fetching house details:",error);
-    res.status(500).json({ message: 'Server error' });
 
+
+exports.getItems = async (req, res) => {
+  try {
+    const { type } = req.query;
+    const userId = req.userId;
+    const Model = type === "property" ? Property : Event;
+    const items = await Model.find({ user: userId });
+    res.status(200).json(items);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: `Failed to fetch ${type}s` });
   }
-
-}
+};
