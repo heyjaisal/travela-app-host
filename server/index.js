@@ -6,7 +6,8 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const authRoute = require('./routes/Gauth.routes');
 const authRoutes = require('./routes/auth.routes'); 
-const userRoutes = require('./routes/user.routes');
+const userRoutes = require('./routes/create.routes');
+const hostRoutes = require('./routes/host.routes')
 
 const app = express();
 require('dotenv').config();
@@ -36,7 +37,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/api/auth', authRoutes); 
-app.use('/api', userRoutes);
+app.use('/api/host/auth', userRoutes);
+app.use('/api/host',hostRoutes)
 app.use(authRoute);
 app.use("/uploads", express.static("uploads"));
 

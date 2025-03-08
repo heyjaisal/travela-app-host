@@ -1,8 +1,12 @@
+
+import Linechart from '@/tools/line-chart'
 import React from 'react'
 
 const Dashboard = () => {
   return (
-    <div>Dashboard</div>
+    <div className='p-5'>
+      <Linechart/>
+    </div>
   )
 }
 

@@ -162,7 +162,6 @@ exports.getHost = async (req, res) => {
     const user = await Host.findById(req.userId);
 
     if (!user) return res.status(404).send("USER NOT FOUND");
-    console.log(user.image);
   
 
     return res.status(200).json({

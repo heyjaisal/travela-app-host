@@ -106,7 +106,6 @@ const ProfilePage = () => {
       withCredentials:true
     })
     if(response.status === 200){
-      console.log('set nigga');
       dispatch(setUserInfo(undefined));
       navigate("/login")
     }
@@ -122,7 +121,7 @@ const ProfilePage = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/api/upload`,
+        `${API_BASE_URL}/api/host/auth/upload`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -148,7 +147,7 @@ const ProfilePage = () => {
     setLoading(true);
     try {
       const response = await axios.delete(
-        `${API_BASE_URL}/api/delete`,
+        `${API_BASE_URL}/api/host/auth/delete`,
         {
           withCredentials: true,
           data: {

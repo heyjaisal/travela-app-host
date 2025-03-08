@@ -12,18 +12,18 @@ import Signup from "./pages/Signup";
 import Payment from "./pages/payment";
 import Profile from "./pages/Account";
 import Account from "./main/profile";
-import Adminlayout from "./components/Navbar/Admin-layout";
+import Adminlayout from "./components/layout/Navbar-layout";
 import { useDispatch, useSelector } from "react-redux";
 import { Circles } from "react-loader-spinner";
 import { setUserInfo } from "./redux/slice/auth";
 import axios from "axios";
-import LoginPage from "./pages/test";
 import { Analytics } from "./pages/analyics";
+import Dashboard from "./pages/Dashboard";
 
 const PrivateRoute = ({ children }) => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const isAuthenticated = !!userInfo;
-  return isAuthenticated ? children : <Navigate to="/" />;
+  return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
 const AuthRoute = ({ children }) => {
@@ -83,7 +83,7 @@ const App = () => {
               path="/home"
               element={
                 <PrivateRoute>
-                  <Analytics />
+                  <Dashboard />
                 </PrivateRoute>
               }
             />
@@ -121,7 +121,7 @@ const App = () => {
               }
             />
             <Route
-              path="/notifications"
+              path="/notification"
               element={
                 <PrivateRoute>
                   <Notification />

@@ -19,7 +19,7 @@ const EventUpdate = () => {
     const fetchData = async () =>{
       try{
         
-        const response = axios.get('http://localhost:5000/api/type',{
+        const response = axios.get('http://localhost:5000/api/host/auth/type',{
           withCredentials: true,
         })
         setEventForm(response.data);

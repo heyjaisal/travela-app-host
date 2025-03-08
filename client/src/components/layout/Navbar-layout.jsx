@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import AdminNavbar from "./Admin-navbar";
+import AdminNavbar from "./Navbar";
 
 const AdminDashboardLayout = () => {
   return (
@@ -7,7 +7,9 @@ const AdminDashboardLayout = () => {
       <div className="flex flex-1">
         <AdminNavbar />
         <div className="flex-auto bg-lightBg">
+        <main className="mt-12 lg:mt-0 md:mt-0">
           <Outlet />
+          </main>
         </div>
       </div>
     </div>

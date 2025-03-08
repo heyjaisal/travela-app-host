@@ -16,27 +16,31 @@ const Housing = () => {
     bedrooms: 0,
     kitchen: 0,
     bathrooms: 0,
-    houseDateTime:null,
+    houseDateTime: null,
     maxGuests: 0,
     maxStay: 0,
-    location: { lat: 51.505, lng: -0.09 },
+    location: { lat: 11.25390467304297, lng: 75.7804084176639 },
     address: "",
+    city: "",
+    state: "",
+    country: "",
+    street: "",
     searchQuery: "",
     mapType: "satellite",
     features: [],
     featurestext: "",
     editfeatures: null,
-    image: "",
+    images: [],
   });
 
+
   const handleDateTimeChange = (dateTime) => {
-    setformData({ ...formData, eventDateTime: dateTime });
+    setformData({ ...formData, houseDateTime: dateTime });
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setformData({ ...formData, [name]: value });
-    
   };
 
   const increment = (field) => {
@@ -62,14 +66,14 @@ const Housing = () => {
       houseDateTime: null,
       maxGuests: 0,
       maxStay: 0,
-      location: { lat: 51.505, lng: -0.09 },
+      location: { lat: 11.25390467304297, lng: 75.7804084176639 },
       address: "",
       searchQuery: "",
       mapType: "satellite",
-      features: [], 
+      features: [],
       featurestext: "",
       editfeatures: null,
-      image: "",
+      images: [], 
     });
   };
 
@@ -90,12 +94,12 @@ const Housing = () => {
     if (validateFields()) {
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/add",
-          { data: formData , type:'property'},
+          "http://localhost:5000/api/host/auth/add",
+          { data: formData, type: 'property' },
           { withCredentials: true }
         );
         toast.success("Property details submitted successfully!");
-        handleCancel()
+        handleCancel();
       } catch (error) {
         console.error("Error:", error);
         toast.error("Failed to submit property details.");
@@ -194,6 +198,7 @@ const Housing = () => {
               <p className="text-red-500 text-sm mt-1">{errors.description}</p>
             )}
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-700">
               Event Date and Time
@@ -209,9 +214,9 @@ const Housing = () => {
                 />
               )}
             />
-            {errors.eventDateTime && (
+            {errors.houseDateTime && (
               <p className="text-red-500 text-sm mt-1">
-                {errors.eventDateTime}
+                {errors.houseDateTime}
               </p>
             )}
           </div>
@@ -246,7 +251,7 @@ const Housing = () => {
                     onClick={() => increment(field)}
                     className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition duration-200"
                   >
-                    <span className="text-2xl font-bold">+</span>
+                    < span className="text-2xl font-bold">+</span>
                   </button>
                 </div>
               </div>
@@ -257,17 +262,7 @@ const Housing = () => {
       </div>
       {/* map section  */}
       <div>
-      <ImageUploader formData={formData} setformData={setformData} type='housing'/>
-        {formData.image && (
-          <div className="mt-4">
-            <img
-              src={formData.image}
-              alt="Uploaded"
-              className="max-w-full h-auto rounded-md border border-gray-300"
-            />
-          </div>
-        )}
-
+        <ImageUploader formData={formData} setformData={setformData} type='housing' />
         <MapComponent formData={formData} setformData={setformData} />
 
         <div className="mt-4">

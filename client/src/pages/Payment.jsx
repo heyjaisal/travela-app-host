@@ -1,9 +1,10 @@
+import { Areachart } from '@/tools/area-chart'
 import React from 'react'
 
 const payment = () => {
   return (
-    <div>
-      
+    <div className='p-5'>
+      <Areachart/>
     </div>
   )
 }

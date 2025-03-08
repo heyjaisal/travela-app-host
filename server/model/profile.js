@@ -2,20 +2,24 @@ const mongoose = require("mongoose");
 
 const hostSchema = new mongoose.Schema(
   {
-    username:{type:String},
+    username: { type: String }, 
     email: { type: String, required: true, unique: true },
-    password: { type: String  },
+    password: { type: String },
     role: { type: String, default: "host" },
     country: { type: String },
     googleId: { type: String },
     street: { type: String },
+    age:{type:String},
     firstName: { type: String },
-    lastName:{type:String},
-    image: { type: String, required: false ,default:null},
-    profileSetup: { type: Boolean,default: false},
+    lastName: { type: String }, 
+    image: {type:String,default:null },
+    profileSetup: { type: Boolean, default: false },
     city: { type: String },
-    phone: { type: Number },
+    phone: { type: String }, 
     gender: { type: String, enum: ["male", "female"] },
+    status: { type: String, enum: ['active', 'inactive', 'isRestricted'], default: 'active' },
+    isRestricted: { type: Boolean, default: false },
+    bio: { type: String, maxlength: 500 },
   },
   { timestamps: true }
 );

@@ -21,7 +21,7 @@ const chartConfig = {
     label: "Mobile",
     color: "#60a5fa",
   },
-};+-
+};
 
 export function Analytics() {
   return (

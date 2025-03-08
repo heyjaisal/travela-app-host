@@ -1,4 +1,4 @@
-const Event = require("../model/events");
+const Events = require("../model/events");
 const Property = require("../model/housing");
 const cloudinary = require('../config/cloudinary')
 const Host = require("../model/profile")
@@ -8,9 +8,9 @@ require("dotenv").config();
 
 exports.handleRequest = async (req, res) => {
   try {
-    const { data, features, type } = req.body;
+    const { data, type } = req.body;
     const userId = req.userId;
-    const Model = type === "property" ? Property : Event;
+    const Model = type === "property" ? Property : Events;
 
     const newItem = new Model({
       ...data,
@@ -67,7 +67,7 @@ exports.deleteImage = async (req, res) => {
     
     if (!image || !type) return res.status(400).json({ message: "No image or type provided" });
 
-    const models = { profile: Host, event: Event, housing: Housing };
+    const models = { profile: Host, event: Events, housing: Housing };
     const model = models[type];
     if (!model) return res.status(400).json({ message: "Invalid type" });
 
@@ -96,7 +96,7 @@ exports.getItems = async (req, res) => {
   try {
     const { type } = req.query;
     const userId = req.userId;
-    const Model = type === "property" ? Property : Event;
+    const Model = type === "property" ? Property : Events;
     const items = await Model.find({ user: userId });
     res.status(200).json(items);
   } catch (error) {

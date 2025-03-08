@@ -82,10 +82,7 @@ exports.contactList = async (req, res) => {
           }
         }
       ])
-      return res.status(200).json({contacts})
-      
-  
-     
+      return res.status(200).json({contacts});
     } catch (error) {
       console.log(error);
       return res.status(500).send("Internal server Error");

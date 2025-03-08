@@ -17,19 +17,20 @@ const Events = () => {
     maxGuests: 0,
     description: "",
     eventDateTime: null,
-    location: { lat: 51.505, lng: -0.09 },
+    location: { lat: 11.25390467304297, lng: 75.7804084176639 },
     address: "",
+    city: "",
+    street: "",
+    country: "",
+    state: "",
     isFreeTicket: false,
     searchQuery: "",
     mapType: "satellite",
     features: [],
     featurestext: "",
     editfeatures: null,
-    image: null,    
-    public_id: "", 
-    imageFile: null,
+    images: [], 
   });
-  
 
   const handleDateTimeChange = (dateTime) => {
     setformData({ ...formData, eventDateTime: dateTime });
@@ -39,8 +40,6 @@ const Events = () => {
     const { name, value } = e.target;
     setformData({ ...formData, [name]: value });
   };
-
-
 
   const handleFreeTicket = () => {
     setformData((prev) => ({
@@ -94,9 +93,10 @@ const Events = () => {
     if (validateFields()) {
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/add",
+          "http://localhost:5000/api/host/auth/add",
           {
-            data: formData, type:'event'
+            data: formData,
+            type: 'event'
           },
           {
             withCredentials: true,
@@ -113,14 +113,14 @@ const Events = () => {
           maxGuests: 0,
           description: "",
           eventDateTime: null,
-          location: { lat: 51.505, lng: -0.09 },
+          location: { lat: 11.25390467304297, lng: 75.7804084176639 },
           address: "",
           isFreeTicket: false,
           mapType: "satellite",
           features: [],
           featurestext: "",
           editfeatures: null,
-          image: "",
+          images: [],
         });
       } catch (error) {
         console.error("Error:", error);
@@ -132,7 +132,7 @@ const Events = () => {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
       <div>
-        <h2 className="text-lg font-semibold mb-4">Event Creation</h2>
+        <h2 className="text -lg font-semibold mb-4">Event Creation</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-700">
@@ -248,7 +248,7 @@ const Events = () => {
               sx={{ width: "100%" }}
               value={formData.eventDateTime}
               onChange={handleDateTimeChange}
-              textFeild={(params) => (
+              text Feild={(params) => (
                 <input
                   {...params}
                   className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-700 focus:outline-none text-pink-900"
@@ -296,19 +296,7 @@ const Events = () => {
       </div>
       {/* map section  */}
       <div>
-    
-   <ImageUploader formData={formData} setformData={setformData} type='event' />
-    
-
-        {formData.image && (
-          <div className="mt-4">
-            <img
-              src={formData.image}
-              alt="Uploaded"
-              className="max-w-full h-auto rounded-md border border-gray-300"
-            />
-          </div>
-        )}
+        <ImageUploader formData={formData} setformData={setformData} type='event' />
 
         <MapComponent formData={formData} setformData={setformData} />
 
@@ -330,11 +318,12 @@ const Events = () => {
                 maxGuests: 0,
                 description: "",
                 eventDateTime: null,
-                location: { lat: 51.505, lng: -0.09 },
+                location: { lat: 11.25390467304297, lng: 75.7804084176639 },
                 address: "",
                 isFreeTicket: true,
                 searchQuery: "",
                 mapType: "satellite",
+                images: [],
               });
             }}
             className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 focus:ring-2 focus:ring-gray-400 focus:outline-none flex-1"

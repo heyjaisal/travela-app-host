@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvent } from "react-leaflet";
 import { FaMap } from "react-icons/fa";
-import { useState } from "react";
 import axios from "axios";
 
 const MapComponent = ({ formData, setformData }) => {
@@ -18,8 +17,18 @@ const MapComponent = ({ formData, setformData }) => {
       const response = await axios.get(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
       );
-      const { display_name } = response.data;
-      setformData((prev) => ({ ...prev, address: display_name }));
+      const { address } = response.data;
+      console.log(address);
+      
+
+      setformData((prev) => ({
+        ...prev,
+        address: `${address.city}, ${address.road}, ${address.state}, ${address.country}`,
+        city: address.city || address.town || address.village || "Unknown",
+        street: address.road || "Unknown",
+        country: address.country,
+        state: address.state || "Unknown",
+      }));
     } catch (error) {
       console.error("Error fetching address:", error);
     }
@@ -31,12 +40,18 @@ const MapComponent = ({ formData, setformData }) => {
         `https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`
       );
       const result = response.data[0];
+      console.log(result);
+      
       if (result) {
-        const { lat, lon, display_name } = result;
+        const { lat, lon, address } = result;
         setformData({
           ...formData,
           location: { lat: parseFloat(lat), lng: parseFloat(lon) },
-          address: display_name,
+          address:`${address.city}, ${address.road}, ${address.state}, ${address.country}`,
+          city: address.city || address.town || address.village || "Unknown",
+          street: address.road || "Unknown",
+          country: address.country,
+          state: address.state || "Unknown",
         });
       }
     } catch (error) {
@@ -52,13 +67,13 @@ const MapComponent = ({ formData, setformData }) => {
   };
 
   const MapClick = () => {
-      useMapEvent("click", handleMapClick);
-      return null;
-    };
+    useMapEvent("click", handleMapClick);
+    return null;
+  };
 
   return (
     <div>
-       <h2 className="text-lg font-semibold mb-4">Pin point your location</h2>
+      <h2 className="text-lg font-semibold mb-4">Pinpoint your location</h2>
       <div className="flex items-center mb-2">
         <input
           type="text"

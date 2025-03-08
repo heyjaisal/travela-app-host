@@ -1,4 +1,3 @@
-// passport.js
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const Host = require('../model/profile');
@@ -17,8 +16,7 @@ passport.use(
     },
     async (token, tokenSecret, profile, done) => {
       try {
-        console.log('Google Profiless:', profile); 
-
+        
         if (!profile.emails || profile.emails.length === 0) {
           console.error('Google OAuth did not return an email:', profile); 
           return done(new Error('No email associated sswith the Google account'), null);
@@ -26,8 +24,6 @@ passport.use(
 
         const email = profile.emails[0].value; 
         const profileImage = profile.photos?.[0]?.value || '/no-profile-picture.jpg';
-
-        console.log('Extracted Email:', email);
 
         let host = await Host.findOne({ googleId: profile.id });
 

@@ -24,7 +24,7 @@ const HouseUpdate = () => {
     const fetchData = async () =>{
       try{
         
-        const response = axios.get('http://localhost:5000/api/house',{
+        const response = axios.get('http://localhost:5000/api/host/auth/house',{
           withCredentials: true,
         })
         sethouseData(response.data);

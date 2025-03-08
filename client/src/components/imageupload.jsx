@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { X } from "lucide-react";
 
 const ImageUploader = ({ formData, setformData, type }) => {
   const [loading, setLoading] = useState(false);
@@ -21,7 +22,7 @@ const ImageUploader = ({ formData, setformData, type }) => {
     setLoading(true);
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/api/upload",
+        "http://localhost:5000/api/host/auth/upload",
         uploadData,
         {
           withCredentials: true,
@@ -29,11 +30,9 @@ const ImageUploader = ({ formData, setformData, type }) => {
         }
       );
 
-      console.log(data.imageUrl);
-
       setformData((prev) => ({
         ...prev,
-        image: data.imageUrl,
+        images: [...(prev.images || []), data.imageUrl],
         imageFile: null,
       }));
     } catch (error) {
@@ -42,29 +41,19 @@ const ImageUploader = ({ formData, setformData, type }) => {
     }
     setLoading(false);
   };
-  const handleDelete = async () => {
-    if (!formData.image) return alert("No image to delete");
+
+  const handleDelete = async (url) => {
+    if (!url) return alert("No image to delete");
 
     setLoading(true);
     try {
-      console.log(formData.image,type);
-      
-      // Use POST instead of DELETE
-      await axios.delete(
-        "http://localhost:5000/api/delete", // Change to POST
-        {
-          withCredentials: true,
-          data: {
-            image: formData.image,
-            type: type,
-          },
-        }
-      );
-      
-
+      await axios.delete("http://localhost:5000/api/host/auth/delete", {
+        withCredentials: true,
+        data: { image: url, type: type },
+      });
       setformData((prev) => ({
         ...prev,
-        image: "",
+        images: prev.images.filter((image) => image !== url),
       }));
     } catch (error) {
       console.error("Delete Error:", error);
@@ -77,44 +66,46 @@ const ImageUploader = ({ formData, setformData, type }) => {
     <>
       <h2 className="text-lg font-semibold mb-4">Upload images</h2>
       <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-lg p-6 w-full h-40 mb-5">
-        {!formData.image ? (
-          <>
-            <input
-              type="file"
-              onChange={handleImageChange}
-              accept="image/*"
-              className="hidden"
-              id="fileInput"
-            />
-            <label htmlFor="fileInput" className="cursor-pointer text-gray-500">
-              Browse Files
-            </label>
-            {formData.imageFile && (
-              <button
-                onClick={handleUpload}
-                disabled={loading}
-                className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg"
-              >
-                {loading ? "Uploading..." : "Upload"}
-              </button>
-            )}
-          </>
-        ) : (
-          <div className="mt-4 flex flex-col items-center">
-            <img
-              src={formData.image}
-              alt="Uploaded"
-              className="w-32 h-32 object-cover rounded-lg"
-            />
-            <button
-              onClick={handleDelete}
-              disabled={loading}
-              className="mt-2 text-red-500"
-            >
-              {loading ? "Deleting..." : "Delete"}
-            </button>
-          </div>
+        <input
+          type="file"
+          onChange={handleImageChange}
+          accept="image/*"
+          className="hidden"
+          id="fileInput"
+        />
+        <label htmlFor="fileInput" className="cursor-pointer text-gray-500">
+          Browse Files
+        </label>
+        {formData.imageFile && (
+          <button
+            onClick={handleUpload}
+            disabled={loading}
+            className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg"
+          >
+            {loading ? "Uploading..." : "Upload"}
+          </button>
         )}
+      </div>
+
+      {/* Display uploaded images with delete button */}
+      <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {formData.images &&
+          formData.images.map((url, index) => (
+            <div key={index} className="relative w-32 h-32">
+              <img
+                src={url}
+                alt={`Uploaded ${index + 1}`}
+                className="w-full h-full object-cover rounded-lg"
+              />
+              <button
+                onClick={() => handleDelete(url)}
+                disabled={loading}
+                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow-lg"
+              >
+                <X size={20} />
+              </button>
+            </div>
+          ))}
       </div>
     </>
   );
