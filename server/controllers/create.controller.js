@@ -60,7 +60,6 @@ exports.uploadImage = async (req, res) => {
   }
 };
 
-
 exports.deleteImage = async (req, res) => {
   try {
     const { image, type } = req.body;
