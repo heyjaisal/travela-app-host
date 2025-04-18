@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { X } from "lucide-react"; 
-import Events from "../main/events";
-import Housing from "../main/housing";
+import Events from "../event/events";
+import Housing from "../property/housing";
 import { useNavigate } from "react-router-dom";
 
 const HostPage = () => {

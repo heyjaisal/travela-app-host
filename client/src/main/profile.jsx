@@ -8,13 +8,15 @@ import { FaPlus, FaTrash } from "react-icons/fa";
 import { API_BASE_URL } from "@/utils/constants";
 import { Circles } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
+import { useOnceEffect } from "@/hooks/useeffectOnce";
 
 const ProfilePage = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const userinfo = useSelector((state) => state.auth.userInfo);
   const [image, setImage] = useState(userinfo?.image || null);
   const fileInputRef = useRef(null);
+  const [loadings, setLoadings] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [errors, setErrors] = useState({});
@@ -31,8 +33,8 @@ const ProfilePage = () => {
     gender: "",
   });
 
-  // Fetch user profile data on component mount
-  useEffect(() => {
+ 
+  useOnceEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/auth/profile`, {
@@ -46,7 +48,7 @@ const ProfilePage = () => {
     };
 
     fetchData();
-  }, []);
+  });
 
   // Handle input field changes
   const handleFieldChange = (e) => {
@@ -54,7 +56,23 @@ const ProfilePage = () => {
     setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Validate form fields
+  const connectStripe = async () => {
+    console.log("is thi happeing");
+
+    setLoadings(true);
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/payment/connect-stripe",
+        {},
+        { withCredentials: true }
+      );
+      window.location.href = res.data.url;
+    } catch (error) {
+      console.error("Stripe Connection Failed", error);
+    }
+    setLoadings(false);
+  };
+
   const validateFields = () => {
     let tempErrors = {};
 
@@ -84,7 +102,6 @@ const ProfilePage = () => {
           { withCredentials: true }
         );
 
-     
         dispatch(setUserInfo(data.user));
         toast.success("Profile details submitted successfully!");
       } catch (error) {
@@ -100,24 +117,23 @@ const ProfilePage = () => {
     }
   };
 
-
-  const logOut = async ()=>{
-    const response = await axios.get(`${API_BASE_URL}/api/auth/logout`,{
-      withCredentials:true
-    })
-    if(response.status === 200){
+  const logOut = async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/auth/logout`, {
+      withCredentials: true,
+    });
+    if (response.status === 200) {
       dispatch(setUserInfo(undefined));
-      navigate("/login")
+      navigate("/login");
     }
-  }
+  };
   const handleImage = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-  
+
     const formData = new FormData();
     formData.append("image", file);
     formData.append("type", "profile");
-  
+
     setLoading(true);
     try {
       const response = await axios.post(
@@ -128,7 +144,7 @@ const ProfilePage = () => {
           withCredentials: true,
         }
       );
-  
+
       if (response.status === 200) {
         const imageUrl = response.data.imageUrl;
         dispatch(setUserInfo({ ...userinfo, image: imageUrl }));
@@ -142,7 +158,7 @@ const ProfilePage = () => {
       setLoading(false);
     }
   };
-  
+
   const deleteImage = async () => {
     setLoading(true);
     try {
@@ -156,7 +172,7 @@ const ProfilePage = () => {
           },
         }
       );
-  
+
       if (response.status === 200) {
         dispatch(setUserInfo({ ...userinfo, image: null }));
         setImage(null);
@@ -169,12 +185,17 @@ const ProfilePage = () => {
       setLoading(false);
     }
   };
-  
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <Circles height="50" width="50" color="#4fa94d" ariaLabel="loading" visible={true} />
+        <Circles
+          height="50"
+          width="50"
+          color="#4fa94d"
+          ariaLabel="loading"
+          visible={true}
+        />
       </div>
     );
   }
@@ -217,7 +238,9 @@ const ProfilePage = () => {
             {hovered && (
               <div
                 className="absolute inset-0 flex items-center justify-center bg-black/50 ring-fuchsia-50 rounded-full"
-                onClick={image ? deleteImage : () => fileInputRef.current.click()}
+                onClick={
+                  image ? deleteImage : () => fileInputRef.current.click()
+                }
               >
                 {image ? (
                   <FaTrash className="text-white text-3xl cursor-pointer" />
@@ -379,6 +402,10 @@ const ProfilePage = () => {
             {errors.gender && (
               <p className="text-red-500 text-sm mt-1">{errors.gender}</p>
             )}
+
+            <button onClick={connectStripe} disabled={loadings} className="bg-blue-500 text-white px-4 py-2 rounded mt-4 m-2">
+              {loadings ? "Connecting..." : "Connect Stripe"}
+            </button>
           </div>
 
           <button
@@ -389,7 +416,7 @@ const ProfilePage = () => {
             Save
           </button>
           <button
-          onClick={logOut}
+            onClick={logOut}
             className="bg-red-600 text-white px-4 py-2 rounded mt-4 m-2"
           >
             Logout

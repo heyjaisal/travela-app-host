@@ -1,15 +1,15 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import Booking from "./pages/Bookings";
+import Booking from "./bookings/Booking";
 import Create from "./pages/Creates";
 import Home from "./pages/Dashboard";
-import Hosted from "./pages/hosted";
+import Hosted from "./pages/Hosted";
 import Landing from "./pages/landing";
 import Login from "./pages/Login";
 import Messages from "./main/messages";
 import Notification from "./pages/notification";
 import Signup from "./pages/Signup";
-import Payment from "./pages/payment";
+import Payment from "./pages/Payment";
 import Profile from "./pages/Account";
 import Account from "./main/profile";
 import Adminlayout from "./components/layout/Navbar-layout";
@@ -19,6 +19,7 @@ import { setUserInfo } from "./redux/slice/auth";
 import axios from "axios";
 import { Analytics } from "./pages/analyics";
 import Dashboard from "./pages/Dashboard";
+import Scan from "./main/scan";
 
 const PrivateRoute = ({ children }) => {
   const userInfo = useSelector((state) => state.auth.userInfo);
@@ -38,27 +39,24 @@ const App = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
 
   useEffect(() => {
-    if (!userInfo) {
-      const getUser = async () => {
-        setLoading(true);
-        try {
-          const response = await axios.get("http://localhost:5000/api/auth/profile", { withCredentials: true });
-          console.log(response);
-          
-          if (response.status === 200 && response.data.id) {
-            dispatch(setUserInfo(response.data));
-          } else {
-            dispatch(setUserInfo(undefined));
-            console.log("no user info");
-          }
-        } catch (error) {
+    const getUser  = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get("http://localhost:5000/api/auth/profile", { withCredentials: true });
+        if (response.status === 200 && response.data.id) {
+          dispatch(setUserInfo(response.data));
+        } else {
           dispatch(setUserInfo(undefined));
-        } finally {
-          setLoading(false);
         }
-      };
+      } catch (error) {
+        dispatch(setUserInfo(undefined));
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      getUser();
+    if (!userInfo) {
+      getUser ();
     }
   }, [userInfo, dispatch]);
 
@@ -69,101 +67,29 @@ const App = () => {
       </div>
     );
   }
-  
-  return (
-    <>
-      <Router>
-        <Routes>
-          <Route path="/" element={<AuthRoute><Landing /></AuthRoute>} />
-          <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
-          <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
 
-          <Route element={<Adminlayout />}>
-            <Route
-              path="/home"
-              element={
-                <PrivateRoute>
-                  <Dashboard />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/create"
-              element={
-                <PrivateRoute>
-                  <Create />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/hosted"
-              element={
-                <PrivateRoute>
-             
-                  <Hosted />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/booking"
-              element={
-                <PrivateRoute>
-                  <Booking />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/messages"
-              element={
-                <PrivateRoute>
-                  <Messages />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/notification"
-              element={
-                <PrivateRoute>
-                  <Notification />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/payments"
-              element={
-                <PrivateRoute>
-                  <Payment />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <PrivateRoute>
-                  <Profile />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/account"
-              element={
-                <PrivateRoute>
-                  <Account />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="*"
-              element={
-                <PrivateRoute>
-                  <Login /> 
-                  </PrivateRoute>
-              }
-            />
-          </Route>
-        </Routes>
-      </Router>
-    </>
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<AuthRoute><Landing /></AuthRoute>} />
+        <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
+        <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
+
+        <Route element={<Adminlayout />}>
+          <Route path="/home" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/create" element={<PrivateRoute><Create /></PrivateRoute>} />
+          <Route path="/hosted" element={<PrivateRoute><Hosted /></PrivateRoute>} />
+          <Route path="/booking" element={<PrivateRoute><Booking /></PrivateRoute>} />
+          <Route path="/messages" element={<PrivateRoute><Messages /></PrivateRoute>} />
+          <Route path="/notification" element={<PrivateRoute><Notification /></PrivateRoute>} />
+          <Route path="/payments" element={<PrivateRoute><Payment /></PrivateRoute>} />
+          <Route path="/scan" element={<PrivateRoute><Scan /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+          <Route path="/account" element={<PrivateRoute><Account /></PrivateRoute>} />
+          <Route path="*" element={<PrivateRoute><Login /></PrivateRoute>} />
+        </Route>
+      </Routes>
+    </Router>
   );
 };
 

@@ -10,6 +10,12 @@ exports.handleRequest = async (req, res) => {
   try {
     const { data, type } = req.body;
     const userId = req.userId;
+
+    const user = await Host.findOne({userId});
+
+    // if(user.profileSetup){
+    //   return res.status(400).json({ error: "Complete your profile and connect to payment to list" });
+    // }
     const Model = type === "property" ? Property : Events;
 
     const newItem = new Model({

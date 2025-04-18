@@ -15,6 +15,7 @@ import {
   ClipboardList,
   CalendarDays,
   User,
+  ScanQrCode,
 } from "lucide-react";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import logo from "../../assets/logo.png";
@@ -47,6 +48,7 @@ function MobileNavbar() {
         <Menu className="text-2xl cursor-pointer" onClick={() => setIsOpen(true)} />
         <img src={logo} alt="logo" className="w-5 h-5 ml-11" />
         <div className="flex items-center gap-4">
+        <ScanQrCode onClick={() => navigate("/scan")} className="text-xl cursor-pointer" />
           <Plus onClick={() => navigate("/create")} className="text-xl cursor-pointer" />
           <Avatar className="h-7 w-7 cursor-pointer" onClick={() => navigate("/profile")}>
             {image ? (

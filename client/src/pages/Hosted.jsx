@@ -1,10 +1,10 @@
 import React,{useState} from 'react'
-import EventUpdate from '../main/update.event';
-import HouseUpdate from '../main/update.housing';
+import EventUpdate from '../event/update.event';
+import HouseUpdate from '../property/update.housing';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
-import Eventlist from '@/main/event-list';
-import Propertylist from '@/main/house-list';
+import Eventlist from '@/event/event-list';
+import Propertylist from '@/property/house-list';
 
 const hosted = () => {
   const [activeTab, setActiveTab] = useState("housing");

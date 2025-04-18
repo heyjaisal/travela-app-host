@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -14,15 +11,6 @@ import { Input } from "@/components/ui/input";
 
 const Signup = () => {
   const navigate = useNavigate();
-
-  const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    if (token) {
-      navigate("/home");
-    }
-  }, [navigate]);
-
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -32,70 +20,68 @@ const Signup = () => {
   });
   const [error, setError] = useState({});
   const [showOtpPopup, setShowOtpPopup] = useState(false);
+  const [loading, setLoading] = useState(false);
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const validateFeilds = () => {
-    let temperror = {};
-
+  const validateFields = () => {
+    let tempError = {};
     const usernameRegex = /^[a-zA-Z0-9\-]+$/;
 
     if (!formData.username) {
-      temperror.username = "User name is required";
+      tempError.username = "User name is required";
     } else if (!usernameRegex.test(formData.username)) {
-      temperror.username =
-        "Username only contains numbers, alphabets, and '-' (No spaces or special characters)";
+      tempError.username = "Username only contains letters, numbers, and '-' (no spaces/special characters)";
     }
     if (!formData.email) {
-      temperror.email = "Email is required";
+      tempError.email = "Email is required";
     }
     if (!formData.password) {
-      temperror.password = "Password is required";
+      tempError.password = "Password is required";
     }
     if (!formData.cpassword) {
-      temperror.cpassword = "Confirm your password";
+      tempError.cpassword = "Confirm your password";
     } else if (formData.password !== formData.cpassword) {
-      temperror.cpassword = "Passwords do not match";
+      tempError.cpassword = "Passwords do not match";
     }
-    setError(temperror);
-    return Object.keys(temperror).length === 0;
+    setError(tempError);
+    return Object.keys(tempError).length === 0;
   };
 
   const handleSendOtp = async (e) => {
-    console.log("otp sended");
-
     e.preventDefault();
-    if (validateFeilds()) {
+    if (validateFields()) {
+      setLoading(true);
       try {
         const response = await axios.post(
           "http://localhost:5000/api/auth/send-otp",
-          { email: formData.email },{
-            withCredentials:true
-          }
+          { email: formData.email, username: formData.username },
+          { withCredentials: true }
         );
-        console.log(response);
         setShowOtpPopup(true);
         setError({});
+        toast.success("OTP sent successfully");
       } catch (err) {
-        setError({ general: "Failed to send OTP. Please try again." });
+        toast.error(err?.response?.data?.message || "Failed to send OTP");
+      }finally {
+        setLoading(false);
       }
     }
   };
 
   const handleVerifyOtp = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/verify-otp",
-        formData
-      );
+      const response = await axios.post("http://localhost:5000/api/auth/verify-otp", formData);
       if (response.status === 201) {
+        toast.success("Signup successful!");
         navigate("/login");
       }
       setShowOtpPopup(false);
     } catch (error) {
-      setError({ otp: "Invalid OTP." });
+      toast.error(error?.response?.data?.error || "OTP verification failed");
     }
   };
 
@@ -105,56 +91,79 @@ const Signup = () => {
 
   return (
     <div>
-   <form className={cn("flex flex-col gap-6")} onSubmit={handleSendOtp}>
+      <form className={cn("flex flex-col gap-6")} onSubmit={handleSendOtp}>
         <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-2xl font-bold">Create a new account</h1>
-          <p className="text-sm text-muted-foreground">complete the feilds</p>
+          <p className="text-sm text-muted-foreground">Complete the fields</p>
         </div>
         <div className="grid gap-6">
           <div className="grid gap-2">
             <Label htmlFor="username">Username</Label>
-            <Input id="username" type="text" placeholder="your username"  value={formData.username} onChange={handleChange} />
+            <Input id="username" type="text" placeholder="your username" value={formData.username} onChange={handleChange} />
             {error.username && <p className="text-red-500 text-sm">{error.username}</p>}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="your@gmai.com"  value={formData.email} onChange={handleChange} />
+            <Input id="email" type="email" placeholder="your@gmail.com" value={formData.email} onChange={handleChange} />
             {error.email && <p className="text-red-500 text-sm">{error.email}</p>}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" placeholder="Enter your password"  value={formData.password} onChange={handleChange} />
+            <Input id="password" type="password" placeholder="Enter your password" value={formData.password} onChange={handleChange} />
             {error.password && <p className="text-red-500 text-sm">{error.password}</p>}
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="cpassword">Password</Label>
+            <Label htmlFor="cpassword">Confirm Password</Label>
             <Input id="cpassword" type="password" placeholder="Re-enter your password" value={formData.cpassword} onChange={handleChange} />
             {error.cpassword && <p className="text-red-500 text-sm">{error.cpassword}</p>}
           </div>
-          
-          <Button type="submit" className="w-full">Send OTP</Button>
+          <Button type="submit" className="w-full" disabled={loading}>{loading ? (
+              <svg
+                className="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v2a6 6 0 100 12v2a8 8 0 01-8-8z"
+                />
+              </svg>
+            ) : (
+              "Send otp"
+            )}</Button>
           <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:flex after:items-center after:border-t after:border-border">
             <span className="relative z-10 bg-background px-2 text-muted-foreground">Or continue with</span>
           </div>
-          <Button variant="outline" className="w-full" onClick={handleGoogleSignup}>
-            <img src="https://img.icons8.com/color/24/000000/google-logo.png" alt="Google Logo" className="mr-2" />
-            Login with Google
-          </Button>
-        </div>
-        <div className="text-center text-sm">
-          Already have an account? <a href="/login" className="underline underline-offset-4">Sign in</a>
         </div>
       </form>
+
+      <Button variant="outline" className="w-full mt-2" onClick={handleGoogleSignup}>
+        <img src="https://img.icons8.com/color/24/000000/google-logo.png" alt="Google Logo" className="mr-2" />
+        Sign up with Google
+      </Button>
+
+      <div className="text-center text-sm mt-2">
+        Already have an account? <a href="/login" className="underline underline-offset-4">Sign in</a>
+      </div>
+
       {showOtpPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-2 text-center">
-              Enter OTP
-            </h3>
+            <h3 className="text-lg font-semibold mb-2 text-center">Enter OTP</h3>
             <InputOTP
               maxLength={6}
               value={formData.otp}
-              onChange={(otp) => setFormData({ ...formData, otp })} 
+              onChange={(otp) => setFormData({ ...formData, otp })}
             >
               <InputOTPGroup>
                 <InputOTPSlot index={0} />
@@ -177,7 +186,9 @@ const Signup = () => {
           </div>
         </div>
       )}
-      </div>
+
+      <ToastContainer/>
+    </div>
   );
 };
 
