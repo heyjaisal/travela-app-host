@@ -1,6 +1,6 @@
 import EventCard from "@/components/Event-cards";
 import { useOnceEffect } from "@/hooks/useeffectOnce";
-import axios from "axios";
+import axiosInstance from '../utils/axios-instance';
 import React, { useState } from "react";
 import { Circles } from "react-loader-spinner";
 
@@ -12,8 +12,8 @@ function Eventlist() {
     const fetchEvent = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(
-          "http://localhost:5000/api/listing/all-items",
+        const { data } = await axiosInstance.get(
+          "/listing/all-items",
           {
             params: { type: "events" },
             withCredentials: true,

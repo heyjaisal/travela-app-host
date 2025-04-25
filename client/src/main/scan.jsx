@@ -1,7 +1,7 @@
 // import { useState, useEffect } from 'react';
 // import { QrReader } from 'react-qr-reader';
 // import { CheckCircle2, XCircle, Send, CameraOff, Camera } from 'lucide-react';
-// import axios from 'axios';
+// import axiosInstance from 'axiosInstance';
 
 // const SimpleQrScanner = () => {
 //   const [data, setData] = useState('');
@@ -23,7 +23,7 @@
 //   const sendData = async (qrData) => {
 //     setStatus('Sending...');
 //     try {
-//       await axios.post('YOUR_BACKEND_ENDPOINT', { qrData });
+//       await axiosInstance.post('YOUR_BACKEND_ENDPOINT', { qrData });
 //       setStatus('Sent successfully!');
 //     } catch (err) {
 //       setError('Send failed: ' + err.message);

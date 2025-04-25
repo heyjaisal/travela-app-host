@@ -2,10 +2,7 @@ const mongoose = require("mongoose");
 
 const propertySchema = new mongoose.Schema(
   {
-    propertyType: {
-      type: String,
-      required: true,
-    },
+    propertyType: { type: String, required: true },
     title: { type: String, required: true, trim: true },
     size: { type: Number, required: true },
     price: { type: Number, required: true, min: 0 },

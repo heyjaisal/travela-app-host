@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import axios from "axios";
+import axiosInstance from '../utils/axios-instance';
 import { setUserInfo } from "../redux/slice/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,8 +36,8 @@ const LoginForm = ({ className, ...props }) => {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
+      const res = await axiosInstance.post(
+        "/auth/login",
         { email, password },
         { withCredentials: true }
       );

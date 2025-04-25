@@ -1,5 +1,5 @@
 import { useOnceEffect } from "@/hooks/useeffectOnce";
-import axios from "axios";
+import axiosInstance from '../utils/axios-instance';
 import React, { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
 
@@ -25,7 +25,7 @@ const HouseUpdate = () => {
     const fetchData = async () =>{
       try{
         
-        const response = axios.get('http://localhost:5000/api/host/auth/house',{
+        const response = axiosInstance.get('/host/auth/house',{
           withCredentials: true,
         })
         sethouseData(response.data);

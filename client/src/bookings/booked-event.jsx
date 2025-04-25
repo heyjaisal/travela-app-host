@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import EventCard from './Event-card';
 import { ScaleLoader } from 'react-spinners';
-import axios from 'axios';
+import axiosInstance from '../utils/axios-instance';
 
 function BookedEvent() {
     const [events, setEvents] = useState([]);
@@ -15,7 +15,7 @@ function BookedEvent() {
         isLoading.current = true;
 
         try {
-            const { data } = await axios.get('http://localhost:5000/api/listing/bookings', {
+            const { data } = await axiosInstance.get('/listing/bookings', {
                 params: { type: 'event', page, limit: 6 },
                 withCredentials: true,
             });

@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+
 import { ToastContainer, toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
 import { setUserInfo } from "@/redux/slice/auth";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { FaPlus, FaTrash } from "react-icons/fa";
-import { API_BASE_URL } from "@/utils/constants";
 import { Circles } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
 import { useOnceEffect } from "@/hooks/useeffectOnce";
@@ -37,7 +36,7 @@ const ProfilePage = () => {
   useOnceEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/auth/profile`, {
+        const response = await axiosInstance.get("/auth/profile", {
           withCredentials: true,
         });
         setProfile(response.data);
@@ -50,7 +49,6 @@ const ProfilePage = () => {
     fetchData();
   });
 
-  // Handle input field changes
   const handleFieldChange = (e) => {
     const { name, value } = e.target;
     setProfile((prev) => ({ ...prev, [name]: value }));
@@ -61,8 +59,8 @@ const ProfilePage = () => {
 
     setLoadings(true);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/payment/connect-stripe",
+      const res = await axiosInstance.post(
+        "/payment/connect-stripe",
         {},
         { withCredentials: true }
       );
@@ -96,8 +94,8 @@ const ProfilePage = () => {
   const handleSave = async () => {
     if (validateFields()) {
       try {
-        const { data } = await axios.put(
-          `${API_BASE_URL}/api/auth/profile`,
+        const { data } = await axiosInstance.put(
+          "/auth/profile",
           Profile,
           { withCredentials: true }
         );
@@ -118,7 +116,7 @@ const ProfilePage = () => {
   };
 
   const logOut = async () => {
-    const response = await axios.get(`${API_BASE_URL}/api/auth/logout`, {
+    const response = await axiosInstance.get("/api/auth/logout", {
       withCredentials: true,
     });
     if (response.status === 200) {
@@ -136,8 +134,8 @@ const ProfilePage = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/host/auth/upload`,
+      const response = await axiosInstance.post(
+        "/host/auth/upload",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -162,13 +160,13 @@ const ProfilePage = () => {
   const deleteImage = async () => {
     setLoading(true);
     try {
-      const response = await axios.delete(
-        `${API_BASE_URL}/api/host/auth/delete`,
+      const response = await axiosInstance.delete(
+       "/host/auth/delete",
         {
           withCredentials: true,
           data: {
-            image: image, // Include the image URL
-            type: "profile", // Specify the type
+            image: image, 
+            type: "profile", 
           },
         }
       );

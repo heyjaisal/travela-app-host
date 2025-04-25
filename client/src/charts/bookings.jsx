@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
-import axios from "axios"
+import axiosInstance from '../utils/axios-instance';
 
 import {
   Card,
@@ -38,8 +38,8 @@ export default function Linechart() {
   useOnceEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/graphs/line-graph",
+        const res = await axiosInstance.get(
+          "/graphs/line-graph",
           { withCredentials: true }
         )
         setChartData(res.data)

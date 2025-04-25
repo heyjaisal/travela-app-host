@@ -13,7 +13,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import axios from "axios"
+import axiosInstance from "axiosInstance"
 import { useOnceEffect } from "@/hooks/useeffectOnce"
 
 const chartConfig = {
@@ -35,7 +35,7 @@ export default function BarChartBookings() {
   useOnceEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/graphs/line-graph",{withCredentials:true})
+        const res = await axiosInstance.get("/graphs/line-graph",{withCredentials:true})
         setChartData(res.data)
       } catch (error) {
         console.error("Error fetching chart data", error)

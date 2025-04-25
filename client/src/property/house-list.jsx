@@ -1,6 +1,6 @@
 import PropertyCard from '@/components/Property-card'
 import { useOnceEffect } from '@/hooks/useeffectOnce'
-import axios from 'axios'
+import axiosInstance from '../utils/axios-instance';
 import React, { useEffect, useState } from 'react'
 import { Circles } from 'react-loader-spinner'
 
@@ -12,7 +12,7 @@ function Propertylist() {
         const fetchProperty = async () => {
             setLoading(true);
             try {
-                const { data } =await axios.get('http://localhost:5000/api/listing/all-items', { 
+                const { data } =await axiosInstance.get('/listing/all-items', { 
                     params: { type: 'property' }, 
                     withCredentials: true 
                   });

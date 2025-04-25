@@ -4,7 +4,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaEllipsisV } from "react-icons/fa";
-import axios from "axios";
+import axiosInstance from '../utils/axios-instance';
 
 const EventCard = ({ images, eventType, ticketPrice, country, city, _id, onDelete }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -19,7 +19,7 @@ const EventCard = ({ images, eventType, ticketPrice, country, city, _id, onDelet
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/host/delete/${_id}`, { withCredentials: true });
+      await axiosInstance.delete(`/host/delete/${_id}`, { withCredentials: true });
       onDelete(_id);
     } catch (error) {
       console.error("Error deleting event:", error);

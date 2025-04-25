@@ -1,5 +1,5 @@
 import { useOnceEffect } from "@/hooks/useeffectOnce";
-import axios from "axios";
+import axiosInstance from '../utils/axios-instance';
 import React, { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
 const EventUpdate = () => {
@@ -21,7 +21,7 @@ const EventUpdate = () => {
     const fetchData = async () =>{
       try{
         
-        const response = axios.get('http://localhost:5000/api/host/auth/type',{
+        const response = axiosInstance.get('/host/auth/type',{
           withCredentials: true,
         })
         setEventForm(response.data);

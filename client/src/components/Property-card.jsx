@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import axios from "axios";
+import axiosInstance from '../utils/axios-instance';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreVertical } from "lucide-react";
@@ -19,7 +17,7 @@ const PropertyCard = ({ images, propertyType, price, country, city, _id, onDelet
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/listing/delete/${_id}`, {
+      await axiosInstance.delete(`/listing/delete/${_id}`, {
         data: { type: 'property' },
         withCredentials: true
       });

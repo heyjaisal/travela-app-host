@@ -16,7 +16,7 @@ import Adminlayout from "./components/layout/Navbar-layout";
 import { useDispatch, useSelector } from "react-redux";
 import { Circles } from "react-loader-spinner";
 import { setUserInfo } from "./redux/slice/auth";
-import axios from "axios";
+import axiosInstance from "axiosInstance";
 import { Analytics } from "./pages/analyics";
 import Dashboard from "./pages/Dashboard";
 import Scan from "./main/scan";
@@ -42,7 +42,7 @@ const App = () => {
     const getUser  = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("http://localhost:5000/api/auth/profile", { withCredentials: true });
+        const response = await axiosInstance.get("/auth/profile", { withCredentials: true });
         if (response.status === 200 && response.data.id) {
           dispatch(setUserInfo(response.data));
         } else {

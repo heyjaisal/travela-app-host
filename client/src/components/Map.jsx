@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvent } from "react-leaflet";
 import { FaMap } from "react-icons/fa";
-import axios from "axios";
+import axiosInstance from '../utils/axios-instance';
 
 const MapComponent = ({ formData, setformData }) => {
   const [searchQuery, setSearchQuery] = useState(formData.searchQuery);
@@ -14,7 +14,7 @@ const MapComponent = ({ formData, setformData }) => {
 
   const fetchAddress = async (lat, lng) => {
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
       );
       const { address } = response.data;
@@ -36,7 +36,7 @@ const MapComponent = ({ formData, setformData }) => {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`
       );
       const result = response.data[0];

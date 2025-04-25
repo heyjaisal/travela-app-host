@@ -112,7 +112,7 @@ const Housing = () => {
     if (validateFields()) {
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/host/auth/add",
+          "/host/auth/add",
           { data: formData, type: "property" },
           { withCredentials: true }
         );

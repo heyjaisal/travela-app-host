@@ -1,4 +1,3 @@
-"use client"
 
 import { useEffect, useState } from "react"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
@@ -15,7 +14,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { useOnceEffect } from "@/hooks/useeffectOnce"
-import axios from "axios"
+import axiosInstance from '../utils/axios-instance';
 
 const chartConfig = {
   property: {
@@ -34,7 +33,7 @@ export default function Component() {
   useOnceEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/graphs/monthly-payments",{withCredentials:true})
+        const res = await axiosInstance.get("/graphs/monthly-payments",{withCredentials:true})
         setChartData(res.data)
         
       } catch (error) {

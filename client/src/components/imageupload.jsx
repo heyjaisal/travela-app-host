@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axiosInstance from '../utils/axios-instance';
 import { X } from "lucide-react";
 
 const ImageUploader = ({ formData, setformData, type }) => {
@@ -21,8 +21,8 @@ const ImageUploader = ({ formData, setformData, type }) => {
 
     setLoading(true);
     try {
-      const { data } = await axios.post(
-        "http://localhost:5000/api/host/auth/upload",
+      const { data } = await axiosInstance.post(
+        "/host/auth/upload",
         uploadData,
         {
           withCredentials: true,
@@ -47,7 +47,7 @@ const ImageUploader = ({ formData, setformData, type }) => {
 
     setLoading(true);
     try {
-      await axios.delete("http://localhost:5000/api/host/auth/delete", {
+      await axiosInstance.delete("/host/auth/delete", {
         withCredentials: true,
         data: { image: url, type: type },
       });

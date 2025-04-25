@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import axiosInstance from '../utils/axios-instance';
 
 const ConnectStripe = () => {
   const [loading, setLoading] = useState(false);
@@ -7,8 +7,8 @@ const ConnectStripe = () => {
   const connectStripe = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("/api/auth/connect-stripe", {}, { withCredentials: true });
-      window.location.href = res.data.url; // Redirect to Stripe onboarding
+      const res = await axiosInstance.post("/api/auth/connect-stripe", {}, { withCredentials: true });
+      window.location.href = res.data.url;
     } catch (error) {
       console.error("Stripe Connection Failed", error);
     }

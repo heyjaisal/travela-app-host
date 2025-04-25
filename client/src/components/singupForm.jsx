@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axiosInstance from '../utils/axios-instance';
 import { useNavigate } from "react-router-dom";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
 import { toast, ToastContainer } from "react-toastify";
@@ -56,8 +56,8 @@ const Signup = () => {
     if (validateFields()) {
       setLoading(true);
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/auth/send-otp",
+        const response = await axiosInstance.post(
+          "/auth/send-otp",
           { email: formData.email, username: formData.username },
           { withCredentials: true }
         );
@@ -74,7 +74,7 @@ const Signup = () => {
 
   const handleVerifyOtp = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/verify-otp", formData);
+      const response = await axiosInstance.post("/auth/verify-otp", formData);
       if (response.status === 201) {
         toast.success("Signup successful!");
         navigate("/login");

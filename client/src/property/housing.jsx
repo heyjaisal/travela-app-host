@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axiosInstance from '../utils/axios-instance';
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { ToastContainer, toast } from "react-toastify";
 import Feature from "../components/features";
@@ -136,8 +136,8 @@ const Housing = () => {
     if (validateFields()) {
       setLoading(true);
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/host/auth/add",
+        const response = await axiosInstance.post(
+          "/host/auth/add",
           { data: formData, type: "property" },
           { withCredentials: true }
         );

@@ -3,7 +3,7 @@ import PropertyCard from "./Property-card";
 import { ToastContainer } from "react-toastify";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { ScaleLoader } from "react-spinners";
-import axios from "axios";
+import axiosInstance from '../utils/axios-instance';
 
 function BookedProperty() {
   const [properties, setProperties] = useState([]);
@@ -16,7 +16,7 @@ function BookedProperty() {
     isLoading.current = true;
 
     try {
-      const { data } = await axios.get("http://localhost:5000/api/listing/bookings", {
+      const { data } = await axiosInstance.get("/listing/bookings", {
         params: { type: "property", page, limit: 6 },
         withCredentials: true,
       });

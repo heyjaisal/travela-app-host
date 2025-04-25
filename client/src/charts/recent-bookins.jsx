@@ -1,7 +1,6 @@
 
-
 import React, { useEffect, useState } from "react"
-import axios from "axios"
+import axiosInstance from '../utils/axios-instance';
 import {
   flexRender,
   getCoreRowModel,
@@ -101,7 +100,7 @@ export default function DataTableDemo() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/graphs/latest-bookings",{withCredentials:true})
+        const res = await axiosInstance.get("/graphs/latest-bookings",{withCredentials:true})
         setData(res.data)
       } catch (err) {
         console.error("Failed to fetch data", err)
