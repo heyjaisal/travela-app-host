@@ -1,18 +1,21 @@
+
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Slider from "react-slick";
-import axiosInstance from '../utils/axios-instance';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+import { useSelector } from "react-redux";
+import axiosInstance from "../utils/axios-instance";
+import { useNavigate } from "react-router-dom";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
 import { MoreVertical } from "lucide-react";
 
-const PropertyCard = ({ images, propertyType, price, country, city, _id, onDelete }) => {
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
+const PropertyCard = ({ images, propertyType, price, country, city, _id,averageRating, isSaved }) => {
+
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/property/${_id}`);
   };
 
   const handleDelete = async () => {
@@ -27,30 +30,51 @@ const PropertyCard = ({ images, propertyType, price, country, city, _id, onDelet
     }
   };
 
-  return (
-    <motion.div
-      whileHover={{ scale: 1.03 }}
-      className="relative border p-2 rounded-xl shadow-sm bg-white transition-all duration-300"
-    >
-      <Slider {...settings} className="rounded-xl overflow-hidden">
-        {images.map((img, index) => (
-          <div key={index}>
-            <img
-              src={img}
-              alt={`Property ${index + 1}`}
-              className="w-full h-72 object-cover rounded-xl"
-            />
-          </div>
-        ))}
-      </Slider>
+  
 
-      <div className="mt-3 px-1">
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+  };
+
+  return (
+    <div
+      className="transition-transform duration-300 hover:scale-105 relative border p-2 rounded-lg cursor-pointer"
+      onClick={handleClick}
+    >
+           <div className="overflow-hidden">
+        {images.length > 1 ? (
+          <Slider {...settings} className="rounded-xl">
+            {images.map((img, index) => (
+              <div key={index}>
+                <img
+                  src={img}
+                  alt={`Property ${index + 1}`}
+                  className="w-full h-72 object-cover rounded-xl"
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <img
+            src={images[0]}
+            alt="Property"
+            className="w-full h-72 object-cover rounded-xl"
+          />
+        )}
+      </div>
+
+      <div className="mt-2 px-1">
         <h3 className="text-lg font-semibold truncate">{propertyType}</h3>
-        <p className="text-muted-foreground text-sm truncate">{city}, {country}</p>
-        <div className="flex justify-between items-center mt-2">
+        <p className="text-gray-500 text-sm truncate">
+          {city}, {country}
+        </p>
+        <div className="flex justify-between items-center mt-1 relative">
           <span className="text-lg font-bold">
-            ₹{price}
-            <span className="text-sm font-normal text-muted-foreground"> /night</span>
+            ₹{price}/<span className="text-red-200 font-thin">night</span>
           </span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -59,13 +83,13 @@ const PropertyCard = ({ images, propertyType, price, country, city, _id, onDelet
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-28">
-              <DropdownMenuItem onClick={() => alert("View Clicked")}>View</DropdownMenuItem>
               <DropdownMenuItem onClick={handleDelete} className="text-red-500">Delete</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+        
       </div>
-    </motion.div>
+    </div>
   );
 };
 

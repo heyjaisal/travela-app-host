@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/add', authorization, handleRequest);
 router.get('/items', authorization, getItems);
-router.post('/upload',authorization, upload.single('image'), uploadImage);
+router.post('/upload', authorization, upload.any(), uploadImage);
 router.delete('/delete',authorization, deleteImage);
 
 module.exports = router;

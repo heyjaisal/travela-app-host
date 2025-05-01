@@ -1,70 +1,33 @@
-import React, { useState } from "react";
-import axiosInstance from '../utils/axios-instance';
+import React from "react";
 import { X } from "lucide-react";
 
-const ImageUploader = ({ formData, setformData, type }) => {
-  const [loading, setLoading] = useState(false);
-
+const ImageUploader = ({ formData, setformData }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setformData((prev) => ({ ...prev, imageFile: file }));
+    if (!file) return;
+
+    if (formData.images.length >= 5) {
+      alert("You can only upload up to 5 images.");
+      return;
     }
+
+    const previewUrl = URL.createObjectURL(file);
+    setformData((prev) => ({
+      ...prev,
+      images: [...prev.images, { file, previewUrl }],
+    }));
   };
 
-  const handleUpload = async () => {
-    if (!formData.imageFile) return alert("Please select an image");
-
-    const uploadData = new FormData();
-    uploadData.append("image", formData.imageFile);
-    uploadData.append("type", type);
-
-    setLoading(true);
-    try {
-      const { data } = await axiosInstance.post(
-        "/host/auth/upload",
-        uploadData,
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-
-      setformData((prev) => ({
-        ...prev,
-        images: [...(prev.images || []), data.imageUrl],
-        imageFile: null,
-      }));
-    } catch (error) {
-      console.error("Upload Error:", error);
-      alert("Error uploading image");
-    }
-    setLoading(false);
-  };
-
-  const handleDelete = async (url) => {
-    if (!url) return alert("No image to delete");
-
-    setLoading(true);
-    try {
-      await axiosInstance.delete("/host/auth/delete", {
-        withCredentials: true,
-        data: { image: url, type: type },
-      });
-      setformData((prev) => ({
-        ...prev,
-        images: prev.images.filter((image) => image !== url),
-      }));
-    } catch (error) {
-      console.error("Delete Error:", error);
-      alert("Error deleting image");
-    }
-    setLoading(false);
+  const handleDelete = (previewUrl) => {
+    setformData((prev) => ({
+      ...prev,
+      images: prev.images.filter((img) => img.previewUrl !== previewUrl),
+    }));
   };
 
   return (
     <>
-      <h2 className="text-lg font-semibold mb-4">Upload images</h2>
+      <h2 className="text-lg font-semibold mb-4">Upload Images (Max 5)</h2>
       <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-lg p-6 w-full h-40 mb-5">
         <input
           type="file"
@@ -72,34 +35,27 @@ const ImageUploader = ({ formData, setformData, type }) => {
           accept="image/*"
           className="hidden"
           id="fileInput"
+          disabled={formData.images.length >= 5}
         />
-        <label htmlFor="fileInput" className="cursor-pointer text-gray-500">
-          Browse Files
+        <label
+          htmlFor="fileInput"
+          className={`cursor-pointer text-gray-500 ${formData.images.length >= 5 ? "opacity-50 cursor-not-allowed" : ""}`}
+        >
+          {formData.images.length >= 5 ? "Image limit reached" : "Browse Files"}
         </label>
-        {formData.imageFile && (
-          <button
-            onClick={handleUpload}
-            disabled={loading}
-            className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg"
-          >
-            {loading ? "Uploading..." : "Upload"}
-          </button>
-        )}
       </div>
 
-      {/* Display uploaded images with delete button */}
-      <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
         {formData.images &&
-          formData.images.map((url, index) => (
+          formData.images.map((img, index) => (
             <div key={index} className="relative w-32 h-32">
               <img
-                src={url}
-                alt={`Uploaded ${index + 1}`}
+                src={img.previewUrl}
+                alt={`Selected ${index + 1}`}
                 className="w-full h-full object-cover rounded-lg"
               />
               <button
-                onClick={() => handleDelete(url)}
-                disabled={loading}
+                onClick={() => handleDelete(img.previewUrl)}
                 className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow-lg"
               >
                 <X size={20} />

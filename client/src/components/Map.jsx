@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvent } from "react-leaflet";
 import { FaMap } from "react-icons/fa";
-import axiosInstance from '../utils/axios-instance';
+import axios from "axios"; // <-- import plain axios
 
 const MapComponent = ({ formData, setformData }) => {
   const [searchQuery, setSearchQuery] = useState(formData.searchQuery);
@@ -14,19 +14,18 @@ const MapComponent = ({ formData, setformData }) => {
 
   const fetchAddress = async (lat, lng) => {
     try {
-      const response = await axiosInstance.get(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
       );
       const { address } = response.data;
       console.log(address);
-      
 
       setformData((prev) => ({
         ...prev,
-        address: `${address.city}, ${address.road}, ${address.state}, ${address.country}`,
+        address: `${address.city || address.town || address.village || "Unknown"}, ${address.road || "Unknown"}, ${address.state || "Unknown"}, ${address.country || "Unknown"}`,
         city: address.city || address.town || address.village || "Unknown",
         street: address.road || "Unknown",
-        country: address.country,
+        country: address.country || "Unknown",
         state: address.state || "Unknown",
       }));
     } catch (error) {
@@ -36,23 +35,25 @@ const MapComponent = ({ formData, setformData }) => {
 
   const handleSearch = async () => {
     try {
-      const response = await axiosInstance.get(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&addressdetails=1`
       );
       const result = response.data[0];
       console.log(result);
-      
+
       if (result) {
-        const { lat, lon, address } = result;
+        const { lat, lon, display_name, address } = result;
         setformData({
           ...formData,
           location: { lat: parseFloat(lat), lng: parseFloat(lon) },
-          address:`${address.city}, ${address.road}, ${address.state}, ${address.country}`,
-          city: address.city || address.town || address.village || "Unknown",
-          street: address.road || "Unknown",
-          country: address.country,
-          state: address.state || "Unknown",
+          address: display_name || "Unknown place",
+          city: address?.city || address?.town || address?.village || "Unknown",
+          street: address?.road || "Unknown",
+          country: address?.country || "Unknown",
+          state: address?.state || "Unknown",
         });
+      } else {
+        console.error("No results found");
       }
     } catch (error) {
       console.error("Error fetching location:", error);
@@ -103,9 +104,8 @@ const MapComponent = ({ formData, setformData }) => {
           zoom={19}
           scrollWheelZoom={true}
           style={{ height: "400px", width: "100%" }}
-          onClick={handleMapClick}
         >
-          {formData.mapType === "satellite" && (
+          {formData.mapType === "satellite" ? (
             <>
               <TileLayer
                 url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
@@ -116,8 +116,7 @@ const MapComponent = ({ formData, setformData }) => {
                 attribution='Labels &copy; <a href="https://www.esri.com/">Esri</a>'
               />
             </>
-          )}
-          {formData.mapType === "terrain" && (
+          ) : (
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution="&copy; OpenStreetMap contributors"

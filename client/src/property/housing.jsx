@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import axiosInstance from '../utils/axios-instance';
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { ToastContainer, toast } from "react-toastify";
 import Feature from "../components/features";
 import {
@@ -45,34 +44,35 @@ const propertyTypes = [
   { key: "other", label: "Other" },
 ];
 
+const defaultFormData = {
+  propertyType: "apartment",
+  title: "",
+  size: "",
+  price: "",
+  description: "",
+  bedrooms: 0,
+  kitchen: 0,
+  bathrooms: 0,
+   maxGuests: 0,
+  maxStay: 0,
+  location: { lat: 11.25390467304297, lng: 75.7804084176639 },
+  address: "",
+  city: "",
+  state: "",
+  country: "",
+  street: "",
+  searchQuery: "",
+  mapType: "satellite",
+  features: [],
+  featurestext: "",
+  editfeatures: null,
+  images: [],
+}
+
 const Housing = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [formData, setformData] = useState({
-    propertyType: "apartment",
-    title: "",
-    size: "",
-    price: "",
-    description: "",
-    bedrooms: 0,
-    kitchen: 0,
-    bathrooms: 0,
-    houseDateTime: null,
-    maxGuests: 0,
-    maxStay: 0,
-    location: { lat: 11.25390467304297, lng: 75.7804084176639 },
-    address: "",
-    city: "",
-    state: "",
-    country: "",
-    street: "",
-    searchQuery: "",
-    mapType: "satellite",
-    features: [],
-    featurestext: "",
-    editfeatures: null,
-    images: [],
-  });
+  const [formData, setformData] = useState(defaultFormData);
 
   const handleDateTimeChange = (dateTime) => {
     setformData({ ...formData, houseDateTime: dateTime });
@@ -95,27 +95,29 @@ const Housing = () => {
   };
 
   const handleCancel = () => {
-    setformData({
-      propertyType: "apartment",
-      title: "",
-      size: "",
-      price: "",
-      description: "",
-      bedrooms: 0,
-      kitchen: 0,
-      bathrooms: 0,
-      houseDateTime: null,
-      maxGuests: 0,
-      maxStay: 0,
-      location: { lat: 11.25390467304297, lng: 75.7804084176639 },
-      address: "",
-      searchQuery: "",
-      mapType: "satellite",
-      features: [],
-      featurestext: "",
-      editfeatures: null,
-      images: [],
-    });
+    setformData(defaultFormData);
+  };
+
+  const handleImageUpload = async () => {
+    try {
+      const formDataImg = new FormData();
+      formData.images.forEach((img) => {
+        formDataImg.append("file", img.file);
+      });
+      formDataImg.append("type", "property");
+
+      const res = await axiosInstance.post("/host/auth/upload", formDataImg, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
+
+      return res.data.images.map((img) => img.imageUrl);
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      throw new Error("Image upload failed");
+    }
   };
 
   const validateFields = () => {
@@ -136,10 +138,21 @@ const Housing = () => {
     if (validateFields()) {
       setLoading(true);
       try {
+
+        const imageUrls = await handleImageUpload();
+
         const response = await axiosInstance.post(
           "/host/auth/add",
-          { data: formData, type: "property" },
-          { withCredentials: true }
+          {
+            data: {
+              ...formData,
+              images: imageUrls,
+            },
+            type: "property",
+          },
+          {
+            withCredentials: true,
+          }
         );
         toast.success("Property details submitted successfully!");
         handleCancel();
@@ -270,28 +283,6 @@ const Housing = () => {
             />
             {errors.description && (
               <p className="text-red-500 text-sm mt-1">{errors.description}</p>
-            )}
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700">
-              Event Date and Time
-            </label>
-            <DateTimePicker
-              sx={{ width: "100%" }}
-              value={formData.houseDateTime}
-              onChange={handleDateTimeChange}
-              renderInput={(params) => (
-                <input
-                  {...params}
-                  className="mt-2 block w-full p-6 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-700 focus:outline-none text-pink-900"
-                />
-              )}
-            />
-            {errors.houseDateTime && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.houseDateTime}
-              </p>
             )}
           </div>
 

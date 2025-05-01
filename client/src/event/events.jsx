@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axiosInstance from '../utils/axios-instance';
+import axiosInstance from "../utils/axios-instance";
 import Feature from "../components/features";
 import {
   Select,
@@ -14,6 +14,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { ToastContainer, toast } from "react-toastify";
 import MapComponent from "../components/Map";
 import ImageUploader from "@/components/imageupload";
+import dayjs from "dayjs";
 
 const eventTypes = [
   { key: "concert", label: "Concert" },
@@ -29,31 +30,32 @@ const eventTypes = [
   { key: "other", label: "Other" },
 ];
 
-const Events = () => {
-  const [errors, setErrors] = useState({});
+const defaultFormData = {
+  eventType: "concert",
+  title: "",
+  eventVenue: "",
+  ticketPrice: 0,
+  maxGuests: 0,
+  description: "",
+  eventDateTime: null,
+  location: { lat: 11.25390467304297, lng: 75.7804084176639 },
+  address: "",
+  city: "",
+  street: "",
+  country: "",
+  state: "",
+  isFreeTicket: false,
+  searchQuery: "",
+  mapType: "satellite",
+  features: [],
+  featurestext: "",
+  editfeatures: null,
+  images: [],
+};
 
-  const [formData, setformData] = useState({
-    eventType: "concert",
-    title: "",
-    eventVenue: "",
-    ticketPrice: 0,
-    maxGuests: 0,
-    description: "",
-    eventDateTime: null,
-    location: { lat: 11.25390467304297, lng: 75.7804084176639 },
-    address: "",
-    city: "",
-    street: "",
-    country: "",
-    state: "",
-    isFreeTicket: false,
-    searchQuery: "",
-    mapType: "satellite",
-    features: [],
-    featurestext: "",
-    editfeatures: null,
-    images: [], 
-  });
+const Events = () => {
+  const [formData, setformData] = useState(defaultFormData);
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
   const handleDateTimeChange = (dateTime) => {
@@ -101,7 +103,7 @@ const Events = () => {
       tempErrors.location = "Location is required";
     if (!formData.eventDateTime)
       tempErrors.eventDateTime = "Event date and time are required";
-    else if (formData.eventDateTime < new Date()) {
+    else if (dayjs(formData.eventDateTime).isBefore(dayjs())) {
       tempErrors.eventDateTime = "Event date and time must be in the future";
     }
     if (formData.features.length === 0) {
@@ -111,54 +113,66 @@ const Events = () => {
     return Object.keys(tempErrors).length === 0;
   };
 
+  const handleImageUpload = async () => {
+    try {
+      const formDataImg = new FormData();
+      formData.images.forEach((img) => {
+        formDataImg.append("file", img.file);
+      });
+      formDataImg.append("type", "event");
+
+      const res = await axiosInstance.post("/host/auth/upload", formDataImg, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
+
+      return res.data.images.map((img) => img.imageUrl);
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      throw new Error("Image upload failed");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validateFields()) {
-      setLoading(true);
-      try {
-        const response = await axiosInstance.post(
-          "/host/auth/add",
-          {
-            data: formData,
-            type: 'event'
-          },
-          {
-            withCredentials: true,
-          }
-        );
+    if (!validateFields()) return;
 
-        toast.success("Event details submitted successfully!");
-        setformData({
-          eventType: "concert",
-          title: "",
-          eventVenue: "",
-          ticketPrice: 0,
-          maxGuests: 0,
-          description: "",
-          eventDateTime: null,
-          location: { lat: 11.25390467304297, lng: 75.7804084176639 },
-          address: "",
-          isFreeTicket: false,
-          mapType: "satellite",
-          features: [],
-          featurestext: "",
-          editfeatures: null,
-          images: [],
-        });
-      } catch (error) {
-        console.error("Error:", error);
-        toast.error("Failed to submit event details.");
-      }finally {
-        setLoading(false);
-      }
+    setLoading(true);
+
+    try {
+      const imageUrls = await handleImageUpload();
+
+      await axiosInstance.post(
+        "/host/auth/add",
+        {
+          data: {
+            ...formData,
+            images: imageUrls,
+          },
+          type: "event",
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      toast.success("Event details submitted successfully!");
+      setformData(defaultFormData);
+    } catch (error) {
+      console.error("Error submitting event:", error);
+      toast.error("Failed to submit event details.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
       <div>
-        <h2 className="text -lg font-semibold mb-4">Event Creation</h2>
+        <h2 className="text-lg font-semibold mb-4">Event Creation</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <Select
@@ -181,8 +195,8 @@ const Events = () => {
                 </SelectGroup>
               </SelectContent>
             </Select>
-            
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-700">
               Title
@@ -199,6 +213,7 @@ const Events = () => {
               <p className="text-red-500 text-sm mt-1">{errors.title}</p>
             )}
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-700">
               Event Venue
@@ -215,6 +230,7 @@ const Events = () => {
               <p className="text-red-500 text-sm mt-1">{errors.eventVenue}</p>
             )}
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-700">
               Ticket Price
@@ -227,9 +243,7 @@ const Events = () => {
                 onChange={handleInputChange}
                 disabled={formData.isFreeTicket}
                 placeholder={
-                  formData.isFreeTicket
-                    ? "Free Ticket"
-                    : "Enter the ticket price"
+                  formData.isFreeTicket ? "Free Ticket" : "Enter the ticket price"
                 }
                 className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"
               />
@@ -247,14 +261,10 @@ const Events = () => {
           </div>
 
           <div className="mb-4">
-            <label
-              htmlFor="description"
-              className="block text-sm font-semibold text-gray-700"
-            >
+            <label className="block text-sm font-semibold text-gray-700">
               Description
             </label>
             <textarea
-              id="description"
               name="description"
               value={formData.description}
               onChange={handleInputChange}
@@ -266,27 +276,21 @@ const Events = () => {
               <p className="text-red-500 text-sm mt-1">{errors.description}</p>
             )}
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-700">
               Event Date and Time
             </label>
             <DateTimePicker
-              sx={{ width: "100%" }}
               value={formData.eventDateTime}
               onChange={handleDateTimeChange}
-              text Feild={(params) => (
-                <input
-                  {...params}
-                  className="mt-2 block w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-700 focus:outline-none text-pink-900"
-                />
-              )}
+              sx={{ width: "100%", marginTop: "8px" }}
             />
             {errors.eventDateTime && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.eventDateTime}
-              </p>
+              <p className="text-red-500 text-sm mt-1">{errors.eventDateTime}</p>
             )}
           </div>
+
           <div className="border rounded-lg p-2 flex items-center justify-between bg-white mb-4">
             <label className="text-lg font-semibold text-gray-800 mr-4 pl-1">
               Max Guests
@@ -295,7 +299,7 @@ const Events = () => {
               <button
                 type="button"
                 onClick={() => decrement("maxGuests")}
-                className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition duration-200"
+                className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700"
               >
                 <span className="text-2xl font-bold">-</span>
               </button>
@@ -309,21 +313,19 @@ const Events = () => {
               <button
                 type="button"
                 onClick={() => increment("maxGuests")}
-                className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition duration-200"
+                className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700"
               >
                 <span className="text-2xl font-bold">+</span>
               </button>
             </div>
           </div>
+
+          <Feature formData={formData} setformData={setformData} />
         </form>
-
-
-        <Feature formData={formData} setformData={setformData} />
       </div>
-    
-      <div>
-        <ImageUploader formData={formData} setformData={setformData} type='event' />
 
+      <div>
+        <ImageUploader formData={formData} setformData={setformData} type="event" />
         <MapComponent formData={formData} setformData={setformData} />
 
         <div className="mt-4">
@@ -335,23 +337,7 @@ const Events = () => {
         <div className="flex space-x-4 mt-4">
           <button
             type="button"
-            onClick={() => {
-              setformData({
-                eventType: "concert",
-                title: "",
-                eventVenue: "",
-                ticketPrice: 0,
-                maxGuests: 0,
-                description: "",
-                eventDateTime: null,
-                location: { lat: 11.25390467304297, lng: 75.7804084176639 },
-                address: "",
-                isFreeTicket: true,
-                searchQuery: "",
-                mapType: "satellite",
-                images: [],
-              });
-            }}
+            onClick={() => setformData(defaultFormData)}
             className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 focus:ring-2 focus:ring-gray-400 focus:outline-none flex-1"
           >
             Cancel
@@ -362,19 +348,30 @@ const Events = () => {
             className="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:outline-none flex-1"
             disabled={loading}
           >
-             {loading ? ( <svg
-              className="animate-spin h-5 w-5 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v2a6 6 0 100 12v2a8 8 0 01-8-8z"
-              />
-            </svg>) : "Submit"}
+            {loading ? (
+              <svg
+                className="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v2a6 6 0 100 12v2a8 8 0 01-8-8z"
+                />
+              </svg>
+            ) : (
+              "Submit"
+            )}
           </button>
         </div>
       </div>

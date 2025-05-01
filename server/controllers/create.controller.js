@@ -16,6 +16,7 @@ exports.handleRequest = async (req, res) => {
     // if(user.profileSetup){
     //   return res.status(400).json({ error: "Complete your profile and connect to payment to list" });
     // }
+
     const Model = type === "property" ? Property : Events;
 
     const newItem = new Model({
@@ -33,38 +34,40 @@ exports.handleRequest = async (req, res) => {
 
 
 exports.uploadImage = async (req, res) => {
+  const files = req.files?.length ? req.files : req.file ? [req.file] : [];
+
+  if (!files.length) {
+    return res.status(400).json({ message: "No files uploaded" });
+  }
+
+  const folder = {
+    profile: "profile-images",
+    event: "event-images",
+    housing: "housing-images",
+  }[req.body.type] || "default-images";
+
   try {
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
+    const uploads = await Promise.all(
+      files.map((file) =>
+        new Promise((resolve, reject) => {
+          cloudinary.uploader.upload_stream({ folder }, (err, result) =>
+            err ? reject(err) : resolve(result)
+          ).end(file.buffer);
+        })
+      )
+    );
 
-    const folderMap = {
-      profile: "profile-images",
-      event: "event-images",
-      housing: "housing-images",
-    };
-
-    const folder = folderMap[req.body.type] || "default-images";
-
-    const { secure_url: imageUrl, public_id } = await cloudinary.uploader.upload(req.file.path, { folder });
-
-    if (req.body.type === "profile") {
-     
-      
-      const updatedUser = await Host.findByIdAndUpdate(
-        req.userId,
-        { image: imageUrl},
-        { new: true }
-      );
-   
-    }
-
-    res.status(200).json({ imageUrl, public_id, type: req.body.type });
-  } catch (error) {
-    console.error("Error uploading image:", error);
-    res.status(500).json({ message: "Server error" });
+    const images = uploads.map(({ secure_url, public_id }) => ({ imageUrl: secure_url, public_id }));
+    res.status(200).json({ images, type: req.body.type });
+  } catch (err) {
+    console.error("Upload error:", err);
+    res.status(500).json({ message: "Upload failed" });
   }
 };
+
+
+
+
 
 exports.deleteImage = async (req, res) => {
   try {

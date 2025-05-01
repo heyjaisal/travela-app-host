@@ -16,7 +16,7 @@ import Adminlayout from "./components/layout/Navbar-layout";
 import { useDispatch, useSelector } from "react-redux";
 import { Circles } from "react-loader-spinner";
 import { setUserInfo } from "./redux/slice/auth";
-import axiosInstance from "axiosInstance";
+import axiosInstance from "./utils/axios-instance";
 import { Analytics } from "./pages/analyics";
 import Dashboard from "./pages/Dashboard";
 import Scan from "./main/scan";
@@ -71,7 +71,6 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<AuthRoute><Landing /></AuthRoute>} />
         <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
         <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
 
