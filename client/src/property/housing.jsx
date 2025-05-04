@@ -11,7 +11,7 @@ import {
   SelectLabel,
   SelectItem,
 } from "@/components/ui/select";
-import MapComponent from "../components/Map";
+import MapComponent from "../components/Map-locator";
 import ImageUploader from "@/components/imageupload";
 import { Input } from "@/components/ui/input";
 

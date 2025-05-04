@@ -9,6 +9,8 @@ import Login from "./pages/Login";
 import Messages from "./main/messages";
 import Notification from "./pages/notification";
 import Signup from "./pages/Signup";
+import PropertyPage from "./property/property-page";
+import Eventpage from "./event/event-page";
 import Payment from "./pages/Payment";
 import Profile from "./pages/Account";
 import Account from "./main/profile";
@@ -83,6 +85,8 @@ const App = () => {
           <Route path="/notification" element={<PrivateRoute><Notification /></PrivateRoute>} />
           <Route path="/payments" element={<PrivateRoute><Payment /></PrivateRoute>} />
           <Route path="/scan" element={<PrivateRoute><Scan /></PrivateRoute>} />
+          <Route path="/event/:id" element={<PrivateRoute><Eventpage /></PrivateRoute>} />
+          <Route path="/property/:id" element={<PrivateRoute><PropertyPage /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
           <Route path="/account" element={<PrivateRoute><Account /></PrivateRoute>} />
           <Route path="*" element={<PrivateRoute><Login /></PrivateRoute>} />

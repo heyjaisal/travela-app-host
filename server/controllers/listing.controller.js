@@ -66,7 +66,62 @@ exports.getItemsByType = async (req, res) => {
       res.status(500).json({ message: `Error fetching ${type}`, error: error.message });
     }
   };
+
+
+exports.detailList = async (req, res) => {
+  const { id } = req.params;
+  const { type } = req.query;
+
+  let item;
+
+  try {
+    if (type === "event") {
+      item = await Events.findById(id)
+        .populate(
+          "host",
+          "username image email firstName lastName profileSetup stripeAccountId"
+        )
+        .lean();
+
+      // Normalize arrays
+      item.features = Array.isArray(item.features) ? item.features : [];
+      item.images = Array.isArray(item.images) ? item.images : [];
+    } else if (type === "property") {
+      item = await Property.findById(id)
+        .populate(
+          "host",
+          "username image email firstName lastName stripeAccountId"
+        )
+        .lean();
+
+      item.features = Array.isArray(item.features) ? item.features : [];
+      item.images = Array.isArray(item.images) ? item.images : [];
+
   
+      const bookings = await Booking.find({
+        property: id,
+        bookingStatus: "confirmed",
+      }).select("checkIn checkOut");
+
+      item.bookedDates = bookings.map(({ checkIn, checkOut }) => ({
+        checkIn: checkIn.toISOString().split("T")[0],
+        checkOut: checkOut.toISOString().split("T")[0],
+      }));
+    } else {
+      return res.status(400).json({ error: "Invalid type parameter" });
+    }
+
+    if (!item) {
+      return res.status(404).json({ error: `${type} not found` });
+    }
+
+    res.json({ item });
+  } catch (error) {
+    console.error(`Error fetching ${type}:`, error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
   
   exports.DeletebyType = async (req, res) => {
     try {

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { ToastContainer, toast } from "react-toastify";
-import MapComponent from "../components/Map";
+import MapComponent from "../components/Map-locator";
 import ImageUploader from "@/components/imageupload";
 import dayjs from "dayjs";
 
