@@ -1,38 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import Booking from "./bookings/Booking";
-import Create from "./pages/Creates";
-import Home from "./pages/Dashboard";
-import Hosted from "./pages/Hosted";
-import Landing from "./pages/landing";
-import Login from "./pages/Login";
-import Messages from "./main/messages";
-import Notification from "./pages/notification";
-import Signup from "./pages/Signup";
-import PropertyPage from "./property/property-page";
-import Eventpage from "./event/event-page";
-import Payment from "./pages/Payment";
-import Profile from "./pages/Account";
-import Account from "./main/profile";
-import Adminlayout from "./components/layout/Navbar-layout";
 import { useDispatch, useSelector } from "react-redux";
 import { Circles } from "react-loader-spinner";
 import { setUserInfo } from "./redux/slice/auth";
 import axiosInstance from "./utils/axios-instance";
-import { Analytics } from "./pages/analyics";
-import Dashboard from "./pages/Dashboard";
-import Scan from "./main/scan";
+import Adminlayout from "./components/layout/Navbar-layout";
 
+const Booking = lazy(() => import("./bookings/Booking"));
+const Create = lazy(() => import("./pages/Creates"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Hosted = lazy(() => import("./pages/Hosted"));
+const Landing = lazy(() => import("./pages/landing"));
+const Login = lazy(() => import("./pages/Login"));
+const Messages = lazy(() => import("./main/messages"));
+const Notification = lazy(() => import("./pages/notification"));
+const Signup = lazy(() => import("./pages/Signup"));
+const PropertyPage = lazy(() => import("./property/property-page"));
+const Eventpage = lazy(() => import("./event/event-page"));
+const Payment = lazy(() => import("./pages/Payment"));
+const Profile = lazy(() => import("./pages/Account"));
+const Account = lazy(() => import("./main/profile"));
+const Analytics = lazy(() => import("./pages/analyics"));
+const Scan = lazy(() => import("./main/scan"));
+
+// Route wrappers
 const PrivateRoute = ({ children }) => {
   const userInfo = useSelector((state) => state.auth.userInfo);
-  const isAuthenticated = !!userInfo;
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return userInfo ? children : <Navigate to="/login" />;
 };
 
 const AuthRoute = ({ children }) => {
   const userInfo = useSelector((state) => state.auth.userInfo);
-  const isAuthenticated = !!userInfo;
-  return isAuthenticated ? <Navigate to="/home" /> : children;
+  return userInfo ? <Navigate to="/home" /> : children;
 };
 
 const App = () => {
@@ -41,7 +40,7 @@ const App = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
 
   useEffect(() => {
-    const getUser  = async () => {
+    const getUser = async () => {
       setLoading(true);
       try {
         const response = await axiosInstance.get("/auth/profile", { withCredentials: true });
@@ -50,7 +49,7 @@ const App = () => {
         } else {
           dispatch(setUserInfo(undefined));
         }
-      } catch (error) {
+      } catch {
         dispatch(setUserInfo(undefined));
       } finally {
         setLoading(false);
@@ -58,7 +57,7 @@ const App = () => {
     };
 
     if (!userInfo) {
-      getUser ();
+      getUser();
     }
   }, [userInfo, dispatch]);
 
@@ -72,26 +71,32 @@ const App = () => {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
-        <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
+      <Suspense fallback={
+        <div className="flex justify-center items-center h-screen">
+          <Circles height="50" width="50" color="#4fa94d" ariaLabel="loading" visible={true} />
+        </div>
+      }>
+        <Routes>
+          <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
+          <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
 
-        <Route element={<Adminlayout />}>
-          <Route path="/home" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/create" element={<PrivateRoute><Create /></PrivateRoute>} />
-          <Route path="/hosted" element={<PrivateRoute><Hosted /></PrivateRoute>} />
-          <Route path="/booking" element={<PrivateRoute><Booking /></PrivateRoute>} />
-          <Route path="/messages" element={<PrivateRoute><Messages /></PrivateRoute>} />
-          <Route path="/notification" element={<PrivateRoute><Notification /></PrivateRoute>} />
-          <Route path="/payments" element={<PrivateRoute><Payment /></PrivateRoute>} />
-          <Route path="/scan" element={<PrivateRoute><Scan /></PrivateRoute>} />
-          <Route path="/event/:id" element={<PrivateRoute><Eventpage /></PrivateRoute>} />
-          <Route path="/property/:id" element={<PrivateRoute><PropertyPage /></PrivateRoute>} />
-          <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
-          <Route path="/account" element={<PrivateRoute><Account /></PrivateRoute>} />
-          <Route path="*" element={<PrivateRoute><Login /></PrivateRoute>} />
-        </Route>
-      </Routes>
+          <Route element={<Adminlayout />}>
+            <Route path="/home" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            <Route path="/create" element={<PrivateRoute><Create /></PrivateRoute>} />
+            <Route path="/hosted" element={<PrivateRoute><Hosted /></PrivateRoute>} />
+            <Route path="/booking" element={<PrivateRoute><Booking /></PrivateRoute>} />
+            <Route path="/messages" element={<PrivateRoute><Messages /></PrivateRoute>} />
+            <Route path="/notification" element={<PrivateRoute><Notification /></PrivateRoute>} />
+            <Route path="/payments" element={<PrivateRoute><Payment /></PrivateRoute>} />
+            <Route path="/scan" element={<PrivateRoute><Scan /></PrivateRoute>} />
+            <Route path="/event/:id" element={<PrivateRoute><Eventpage /></PrivateRoute>} />
+            <Route path="/property/:id" element={<PrivateRoute><PropertyPage /></PrivateRoute>} />
+            <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+            <Route path="/account" element={<PrivateRoute><Account /></PrivateRoute>} />
+            <Route path="*" element={<PrivateRoute><Login /></PrivateRoute>} />
+          </Route>
+        </Routes>
+      </Suspense>
     </Router>
   );
 };

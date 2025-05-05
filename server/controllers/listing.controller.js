@@ -3,7 +3,6 @@ const Ticket = require('../model/Ticket');
 const Events = require("../model/events");
 const Property = require("../model/housing");
 
-
 exports.BookedListings = async (req, res) => {
     try {
       const { type, page = 1, limit = 6 } = req.query;
@@ -82,8 +81,7 @@ exports.detailList = async (req, res) => {
           "username image email firstName lastName profileSetup stripeAccountId"
         )
         .lean();
-
-      // Normalize arrays
+     
       item.features = Array.isArray(item.features) ? item.features : [];
       item.images = Array.isArray(item.images) ? item.images : [];
     } else if (type === "property") {
