@@ -1,5 +1,5 @@
-const Host = require("../model/profile");
-const Booking = require('../model/Ticket')
+const Host = require("../models/Hosts");
+const Booking = require('../models/Ticket')
 const cloudinary = require("../config/cloudinary")
 
 require("dotenv").config();

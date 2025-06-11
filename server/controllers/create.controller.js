@@ -1,8 +1,8 @@
-const Events = require("../model/events");
-const Property = require("../model/housing");
+const Events = require("../models/events");
+const Property = require("../models/housing");
 const cloudinary = require('../config/cloudinary')
-const Host = require("../model/profile")
-const Housing = require("../model/housing")
+const Host = require("../models/Hosts")
+const Housing = require("../models/housing")
 
 require("dotenv").config();
 

@@ -12,9 +12,10 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Hosted = lazy(() => import("./pages/Hosted"));
 const Landing = lazy(() => import("./pages/landing"));
 const Login = lazy(() => import("./pages/Login"));
-const Messages = lazy(() => import("./main/messages"));
+const Messages = lazy(() => import("./chat/chatpage"));
 const Notification = lazy(() => import("./pages/notification"));
 const Signup = lazy(() => import("./pages/Signup"));
+const BookingDetials = lazy(() => import("./bookings/Booked-details"));
 const PropertyPage = lazy(() => import("./property/property-page"));
 const Eventpage = lazy(() => import("./event/event-page"));
 const Payment = lazy(() => import("./pages/Payment"));
@@ -90,6 +91,7 @@ const App = () => {
             <Route path="/payments" element={<PrivateRoute><Payment /></PrivateRoute>} />
             <Route path="/scan" element={<PrivateRoute><Scan /></PrivateRoute>} />
             <Route path="/event/:id" element={<PrivateRoute><Eventpage /></PrivateRoute>} />
+            <Route path="/booking/:type/:id" element={<PrivateRoute><BookingDetials /></PrivateRoute>} />
             <Route path="/property/:id" element={<PrivateRoute><PropertyPage /></PrivateRoute>} />
             <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
             <Route path="/account" element={<PrivateRoute><Account /></PrivateRoute>} />

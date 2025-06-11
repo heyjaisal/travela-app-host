@@ -1,10 +1,9 @@
 const mongoose = require("mongoose");
-const PropertyBooking = require("../model/booking");
-const EventBooking = require("../model/Ticket");
-const User = require('../model/user')
+const PropertyBooking = require("../models/booking");
+const EventBooking = require("../models/Ticket");
+const User = require('../models/User')
 
 exports.getBookingStats = async (req, res) => {
-  console.log('the time is now');
   
   try {
     const hostId = req.userId;

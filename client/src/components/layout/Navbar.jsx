@@ -75,7 +75,6 @@ function MobileNavbar() {
                 { to: "/home", icon: Home, text: "Home" },
                 { to: "/messages", icon: MessageCircle, text: "Messages" },
                 { to: "/booking", icon: CalendarDays, text: "Bookings" },
-                { to: "/payments", icon: Wallet, text: "Payments" },
                 { to: "/notifications", icon: Bell, text: "Notifications" },
                 { to: "/hosted", icon: ClipboardList, text: "Hosted" },
                 { to: "/account", icon: Settings, text: "Account" },
@@ -152,12 +151,7 @@ function DesktopSidebar() {
         />
 
         <NavItem to="/create" icon={Plus} label="Post" isHovered={isHovered} />
-        <NavItem
-          to="/payments"
-          icon={Wallet}
-          label="Payments"
-          isHovered={isHovered}
-        />
+        
 
         <NavItem
           to="/notification"

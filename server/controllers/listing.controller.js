@@ -1,7 +1,7 @@
-const Booking = require("../model/booking");
-const Ticket = require('../model/Ticket');
-const Events = require("../model/events");
-const Property = require("../model/housing");
+const Booking = require("../models/booking");
+const Ticket = require('../models/Ticket');
+const Events = require("../models/events");
+const Property = require("../models/housing");
 
 exports.BookedListings = async (req, res) => {
     try {
@@ -20,7 +20,7 @@ exports.BookedListings = async (req, res) => {
         totalListings = await Booking.countDocuments({ hostId: userId });
         listings = await Booking.find({ hostId: userId  })
           .sort({ createdAt: -1 })
-          .select("_id checkIn checkOut guests totalAmount transactionId qrCode platformFee isCheckedIn")
+          .select("_id checkIn checkOut guests totalAmount paymentStatus transactionId platformFee isCheckedIn")
           .populate("property", "propertyType title price country city images")
           .populate("hostId", "username image")
           .skip(skip)
@@ -30,7 +30,7 @@ exports.BookedListings = async (req, res) => {
         totalListings = await Ticket.countDocuments({ hostId: userId });
         listings = await Ticket.find({hostId: userId  })
           .sort({ createdAt: -1 })
-          .select("_id ticketsBooked totalAmount bookingStatus paymentStatus refundStatus qrCode isCheckedIn transactionId")
+          .select("_id ticketsBooked totalAmount bookingStatus paymentStatus refundStatus isCheckedIn transactionId")
           .populate("hostId", "username image")
           .populate("event", "eventType title eventVenue ticketPrice country city images")
           .skip(skip)
@@ -65,7 +65,6 @@ exports.getItemsByType = async (req, res) => {
       res.status(500).json({ message: `Error fetching ${type}`, error: error.message });
     }
   };
-
 
 exports.detailList = async (req, res) => {
   const { id } = req.params;
@@ -119,7 +118,6 @@ exports.detailList = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
   
   exports.DeletebyType = async (req, res) => {
     try {
@@ -144,3 +142,42 @@ exports.detailList = async (req, res) => {
       res.status(500).json({ message: "Error deleting item", error: error.message });
     }
   };
+
+exports.getBookingDetailsById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { type } = req.query;
+
+    if (!type || !["property", "event"].includes(type)) {
+      return res.status(400).json({ message: "Valid type is required (property or event)" });
+    }
+
+    let booking;
+
+    if (type === "property") {
+      booking = await Booking.findById(id)
+        .select("_id checkIn checkOut guests totalAmount transactionId platformFee isCheckedIn qrCode createdAt")
+        .populate("property", "propertyType title description price country city address images amenities")
+        .populate("hostId", "username email image phone")
+        .lean();
+    } else if (type === "event") {
+      booking = await Ticket.findById(id)
+        .select("_id ticketsBooked totalAmount bookingStatus paymentStatus refundStatus isCheckedIn transactionId qrCode createdAt")
+        .populate("event", "eventType title description eventVenue ticketPrice country city date time images")
+        .populate("hostId", "username email image phone")
+        .lean();
+    }
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    return res.json({ type, booking });
+  } catch (error) {
+    console.error("Error fetching booking by ID:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+

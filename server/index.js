@@ -2,54 +2,85 @@ const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const cors = require('cors');
+const http = require('http');
+const { Server } = require('socket.io');
+require('dotenv').config();
+
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const authRoute = require('./routes/Gauth.routes');
 const authRoutes = require('./routes/auth.routes'); 
 const userRoutes = require('./routes/create.routes');
 const listingRoutes = require('./routes/listing.routes');
+const message = require("./routes/messages.routes")
 const paymentRoutes = require('./routes/payment.routes');
 const GraphRoutes = require('./routes/graphs.routes');
 
+const setupSocketServer = require('./sockets/index'); 
+
 const app = express();
-require('dotenv').config();
 
-const mongoURL = process.env.MONGO_URI;
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: ['http://localhost:5173', 'http://localhost:5175'],
+    credentials: true,
+  },
+});
+app.set('io', io);
+app.set('trust proxy', 1);
 
-const Port = process.env.PORT || 5000
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5175',
+  ],
+  credentials: true,
+}));
 
 app.use(cookieParser());
+
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'keyboard cat',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production' },
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  },
 }));
 
 app.use(express.json());
 
 require('./config/passport');
-
-app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true,
-}));
-
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 app.use('/api/auth', authRoutes); 
 app.use('/api/host/auth', userRoutes);
 app.use('/api/listing',listingRoutes)
 app.use('/api/payment',paymentRoutes)
-app.use('/api/graphs',GraphRoutes)
+app.use('/api/graphs',GraphRoutes);
+app.use('/api/chat',message)
 app.use(authRoute);
 app.use("/uploads", express.static("uploads"));
 
-const server = app.listen(Port, () => {
-  console.log(`Server running on port ${process.env.PORT || 5000}`);
-});
+setupSocketServer(io); 
 
-mongoose.connect(mongoURL).then(() => {
-  console.log('Database connection done');
-}).catch(err => console.log(err.message));
+const startServer = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('[DB] ✅ Connected to MongoDB');
+
+    const PORT = 7000;
+    server.listen(PORT, () => {
+      console.log(`[Server] 🚀 Listening on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('[DB] ❌ MongoDB connection failed:', err.message);
+    process.exit(1);
+  }
+};
+
+startServer();

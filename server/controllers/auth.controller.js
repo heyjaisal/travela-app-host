@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const Host = require("../model/profile");
-const Otp = require("../model/otp");
+const Host = require("../models/Hosts");
+const Otp = require("../models/otp");
 const bcrypt = require("bcrypt");
 const transporter  = require("../config/nodemailer");
 
@@ -105,9 +105,9 @@ exports.userlogin = async (req, res) => {
     }
     
 
-    const token = jwt.sign({ email: user.email, userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ email: user.email, userId: user._id ,role:user.role}, process.env.JWT_SECRET, { expiresIn: '1d' });
 
-    res.cookie("token", token, {
+    res.cookie("tokens", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -187,6 +187,7 @@ exports.getHost = async (req, res) => {
       profileSetup: user.profileSetup,
       firstName: user.firstName,
       lastName: user.lastName,
+      role: user.role,  
       image: user.image,
       username: user.username,
       country: user.country,
@@ -205,7 +206,7 @@ exports.getHost = async (req, res) => {
 
 exports.logout = async (req, res) => {
   try {
-    res.cookie("token", "", { maxAge: 1, secure: true, sameSite: "None" });
+    res.cookie("tokens", "", { maxAge: 1, secure: true, sameSite: "None" });
 
     return res.status(200).send("Logout Succesfull");
   } catch (error) {

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
-const Host = require("../model/profile")
-const Message = require("../model/messags")
+const Host = require("../models/Hosts")
+const Message = require("../models/messags")
 
 exports.searchContact = async (req, res) => {
     try {

@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@aws-sdk/client-s3": "^3.726.1",
+    "@socket.io/redis-adapter": "^8.3.0",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.7",
@@ -17,7 +18,9 @@
     "nodemailer": "^6.9.16",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "redis": "^5.5.6",
     "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "stripe": "^17.7.0",
     "uuid": "^11.0.5"
   }

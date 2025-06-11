@@ -1,7 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
-const Host = require('../model/profile');
+const Host = require('../models/Hosts');
 const router = express.Router();
 require('dotenv').config();
 
@@ -11,7 +11,6 @@ if (!process.env.JWT_SECRET || !process.env.CLIENT_URL) {
 
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// Google OAuth callback route
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/auth/login/failed' }), async (req, res) => {
   if (!req.user) {
     console.error('No user data found in callback.');
@@ -35,24 +34,23 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
         email,
         googleId,
         profileImage,
-        // No password here
+        
       });
       await host.save();
     }
 
-    // Sign the JWT token with the user ID
-    const token = jwt.sign({ email: host.email, userId: host._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ email: host.email, userId: host._id ,role:host.role}, process.env.JWT_SECRET, { expiresIn: '1d' });
 
-    // Send the token as a cookie
-    res.cookie('token', token, {
+   
+    res.cookie('tokens', token, {
       httpOnly: true,  
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
-      maxAge: 60 * 60 * 24 * 30 * 5 * 1000,  // 5 months expiry
+      maxAge: 60 * 60 * 24 * 30 * 5 * 1000,  
       path: '/',
     });
 
-    // Redirect the user to the home page
+    
     res.redirect(`${process.env.CLIENT_URL}/home`);
     
   } catch (error) {
@@ -68,7 +66,7 @@ router.get('/auth/login/failed', (req, res) => {
 
 router.get('/logout', (req, res) => {
 
-  res.clearCookie('token');
+  res.clearCookie('tokens');
   res.redirect(`${process.env.CLIENT_URL}/`);
 });
 

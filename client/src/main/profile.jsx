@@ -8,6 +8,7 @@ import { FaPlus, FaTrash } from "react-icons/fa";
 import { Circles } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
 import { useOnceEffect } from "@/hooks/useeffectOnce";
+import axiosInstance from "@/utils/axios-instance";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -116,7 +117,7 @@ const ProfilePage = () => {
   };
 
   const logOut = async () => {
-    const response = await axiosInstance.get("/api/auth/logout", {
+    const response = await axiosInstance.get("/auth/logout", {
       withCredentials: true,
     });
     if (response.status === 200) {
