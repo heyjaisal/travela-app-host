@@ -10,7 +10,6 @@ const Booking = lazy(() => import("./bookings/Booking"));
 const Create = lazy(() => import("./pages/Creates"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Hosted = lazy(() => import("./pages/Hosted"));
-const Landing = lazy(() => import("./pages/landing"));
 const Login = lazy(() => import("./pages/Login"));
 const Messages = lazy(() => import("./chat/chatpage"));
 const Notification = lazy(() => import("./pages/notification"));
