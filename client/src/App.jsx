@@ -12,7 +12,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Hosted = lazy(() => import("./pages/Hosted"));
 const Login = lazy(() => import("./pages/Login"));
 const Messages = lazy(() => import("./chat/chatpage"));
-const Notification = lazy(() => import("./pages/notification"));
+const Notification = lazy(() => import("./pages/notifications"));
 const Signup = lazy(() => import("./pages/Signup"));
 const BookingDetials = lazy(() => import("./bookings/Booked-details"));
 const PropertyPage = lazy(() => import("./property/property-page"));
@@ -23,7 +23,7 @@ const Account = lazy(() => import("./main/profile"));
 const Analytics = lazy(() => import("./pages/analyics"));
 const Scan = lazy(() => import("./main/scan"));
 
-// Route wrappers
+
 const PrivateRoute = ({ children }) => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   return userInfo ? children : <Navigate to="/login" />;
