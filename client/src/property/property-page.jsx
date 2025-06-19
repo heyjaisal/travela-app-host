@@ -1,5 +1,5 @@
 import ImageGallery from "@/components/image";
-import MapWithDirectionButton from "@/components/map";
+import MapWithDirectionButton from "@/components/Maps";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import axiosInstance from "@/utils/axios-instance";
 import React, { useEffect, useState } from "react";

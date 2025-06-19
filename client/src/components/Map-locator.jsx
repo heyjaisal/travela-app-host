@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvent } from "react-leaflet";
 import { FaMap } from "react-icons/fa";
-import axios from "axios"; // <-- import plain axios
+import axios from "axios"; 
 
 const MapComponent = ({ formData, setformData }) => {
   const [searchQuery, setSearchQuery] = useState(formData.searchQuery);
